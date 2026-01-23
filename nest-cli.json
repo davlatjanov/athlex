@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/athlex/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/athlex/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/athlex",
+  "projects": {
+    "athlex": {
+      "type": "application",
+      "root": "apps/athlex",
+      "entryFile": "main",
+      "sourceRoot": "apps/athlex/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/athlex/tsconfig.app.json"
+      }
+    },
+    "athlex-batch": {
+      "type": "application",
+      "root": "apps/athlex-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/athlex-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/athlex-batch/tsconfig.app.json"
+      }
+    }
   }
 }
