@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { AthlexBatchService } from './athlex-batch.service';
+import { AthlexBatchService } from './batch.service';
 
 @Controller()
 export class AthlexBatchController {

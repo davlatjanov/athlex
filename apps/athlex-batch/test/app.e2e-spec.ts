@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AthlexBatchModule } from './../src/athlex-batch.module';
+import { BatchModule } from '../src/batch.module';
 
 describe('AthlexBatchController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AthlexBatchModule],
+      imports: [BatchModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
