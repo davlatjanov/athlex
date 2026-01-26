@@ -11,8 +11,9 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { FollowModule } from './follow/follow.module';
 import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
-  imports: [MemberModule, ProductModule, ProgressResultsModule, TrainingProgramModule, TrainingSessionsModule, ViewModule, CommentModule, EventsModule, FeedbackModule, FollowModule, LikeModule, AuthModule]
+  imports: [MemberModule, ProductModule, ProgressResultsModule, TrainingProgramModule, TrainingSessionsModule, ViewModule, CommentModule, EventsModule, FeedbackModule, FollowModule, LikeModule, AuthModule, AdminModule]
 })
 export class ComponentsModule {}
