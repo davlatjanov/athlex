@@ -25,6 +25,7 @@ export enum MemberStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   BANNED = 'BANNED',
+  DELETED = 'DELETED',
 }
 
 registerEnumType(MemberStatus, {
