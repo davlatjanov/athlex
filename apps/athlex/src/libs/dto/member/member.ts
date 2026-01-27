@@ -9,7 +9,7 @@ import {
 @ObjectType()
 export class Member {
   @Field(() => String)
-  _id: mongoose.ObjectId;
+  _id?: mongoose.ObjectId;
 
   @Field(() => MemberType)
   memberType: MemberType;

@@ -11,7 +11,7 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class MemberUpdate {
   @IsNotEmpty()
   @Field(() => String)
-  _id: string;
+  _id?: string;
 
   @IsOptional()
   @Field(() => MemberType, { nullable: true })
@@ -32,10 +32,6 @@ export class MemberUpdate {
   @IsOptional()
   @Field(() => String, { nullable: true })
   memberPlan: string;
-
-  @IsOptional()
-  @Field(() => Int, { nullable: true })
-  memberPrograms: number;
 
   @IsOptional()
   @Field(() => String, { nullable: true })

@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import type { T } from '../../libs/types/common';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 @Resolver()
 export class MemberResolver {
@@ -27,15 +28,6 @@ export class MemberResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Mutation(() => String)
-  public async updateMember(
-    @AuthMember('_id') memberId: ObjectId,
-  ): Promise<string> {
-    console.log('Mutation updateMember');
-    console.log('authMember in updateMember:', memberId);
-    return await this.memberService.updateMember();
-  }
-  @UseGuards(AuthGuard)
   @Query(() => String)
   public async checkAuth(@AuthMember() member: T): Promise<string> {
     console.log('Query checkAuth');
@@ -43,6 +35,17 @@ export class MemberResolver {
       `Hello ${member.memberNick}  your ID => ${member._id} and you are ${member.memberType}`,
     );
     return `Hello ${member.memberNick}  your ID => ${member._id} and you are ${member.memberType}`;
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Member)
+  public async updateMember(
+    @Args('input') input: MemberUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Member> {
+    console.log('Mutation updateMember');
+    delete input._id;
+    return await this.memberService.updateMember(memberId, input);
   }
 
   public async getMember(): Promise<string> {

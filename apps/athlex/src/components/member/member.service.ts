@@ -4,12 +4,14 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Member } from '../../libs/dto/member/member';
 import { Message } from '../../libs/enums/common.enum';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { AuthService } from '../auth/auth.service';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class MemberService {
@@ -60,8 +62,24 @@ export class MemberService {
     return response;
   }
 
-  public async updateMember(): Promise<string> {
-    return 'User updated';
+  public async updateMember(
+    memberId: ObjectId,
+    input: MemberUpdate,
+  ): Promise<Member> {
+    const objId = shapeIntoMongoObjectId(memberId);
+    const updatedData = await this.memberModel
+      .findOneAndUpdate(
+        { _id: objId, memberStatus: MemberStatus.ACTIVE },
+        input,
+        { new: true },
+      )
+      .exec();
+    if (!updatedData) {
+      throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    }
+    updatedData.accessToken =
+      await this.authService.generateJwtToken(updatedData);
+    return updatedData;
   }
 
   public async getMember(): Promise<string> {
