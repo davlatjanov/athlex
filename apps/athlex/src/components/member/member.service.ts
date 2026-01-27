@@ -12,6 +12,7 @@ import { MemberStatus } from '../../libs/enums/member.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { shapeIntoMongoObjectId } from '../../libs/config';
+import { T } from '../../libs/types/common';
 
 @Injectable()
 export class MemberService {
@@ -82,7 +83,17 @@ export class MemberService {
     return updatedData;
   }
 
-  public async getMember(): Promise<string> {
-    return 'User data';
+  public async getMember(targetId: ObjectId): Promise<Member> {
+    const search: T = {
+      _id: targetId,
+      memberStatus: {
+        $in: [MemberStatus.ACTIVE, MemberStatus.BANNED],
+      },
+    };
+    const result = await this.memberModel.findOne(search).exec();
+    if (!result) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
+    return result;
   }
 }

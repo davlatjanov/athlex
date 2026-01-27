@@ -8,6 +8,8 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import type { T } from '../../libs/types/common';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { WithoutGuard } from '../auth/guards/without.guard';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Resolver()
 export class MemberResolver {
@@ -48,7 +50,14 @@ export class MemberResolver {
     return await this.memberService.updateMember(memberId, input);
   }
 
-  public async getMember(): Promise<string> {
-    return 'User data';
+  @UseGuards(WithoutGuard)
+  @Query(() => Member)
+  public async getMember(
+    @Args('memberId') input: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Member> {
+    console.log('Query getMember');
+    const targetId = shapeIntoMongoObjectId(input);
+    return this.memberService.getMember(targetId);
   }
 }
