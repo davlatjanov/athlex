@@ -25,6 +25,9 @@ export class MemberService {
       );
       const newMember = await this.memberModel.create(signUpInput);
 
+      newMember.accessToken =
+        await this.authService.generateJwtToken(newMember);
+
       return newMember;
     } catch (err) {
       console.log('Error: Service signup', err.message);
@@ -52,6 +55,8 @@ export class MemberService {
     if (!isMatch) {
       throw new InternalServerErrorException(Message.WRONG_PASSWORD);
     }
+
+    response.accessToken = await this.authService.generateJwtToken(response);
     return response;
   }
 
