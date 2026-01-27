@@ -58,6 +58,6 @@ export class MemberResolver {
   ): Promise<Member> {
     console.log('Query getMember');
     const targetId = shapeIntoMongoObjectId(input);
-    return this.memberService.getMember(targetId);
+    return this.memberService.getMember(memberId, targetId);
   }
 }
