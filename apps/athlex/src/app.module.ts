@@ -13,6 +13,7 @@ import { T } from './libs/types/common';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     GraphQLModule.forRoot({
       driver: ApolloDriver,

@@ -3,6 +3,7 @@ import { MemberResolver } from './member.resolver';
 import { MemberService } from './member.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import MemberSchema from '../../schemas/Member.schema';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import MemberSchema from '../../schemas/Member.schema';
         schema: MemberSchema,
       },
     ]),
+    AuthModule,
   ],
   providers: [MemberResolver, MemberService],
 })

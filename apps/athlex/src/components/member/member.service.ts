@@ -9,13 +9,20 @@ import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Member } from '../../libs/dto/member/member';
 import { Message } from '../../libs/enums/common.enum';
 import { MemberStatus } from '../../libs/enums/member.enum';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MemberService {
-  constructor(@InjectModel('Member') private memberModel: Model<Member>) {}
+  constructor(
+    @InjectModel('Member') private memberModel: Model<Member>,
+    private readonly authService: AuthService,
+  ) {}
 
   public async signUp(signUpInput: MemberInput): Promise<Member> {
     try {
+      signUpInput.memberPassword = await this.authService.hashPassword(
+        signUpInput.memberPassword,
+      );
       const newMember = await this.memberModel.create(signUpInput);
 
       return newMember;
@@ -36,6 +43,14 @@ export class MemberService {
       throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
     } else if (response.memberStatus === MemberStatus.BANNED) {
       throw new InternalServerErrorException(Message.BANNED_USER);
+    }
+
+    const isMatch = await this.authService.comparePassword(
+      input.memberPassword,
+      response.memberPassword as string,
+    );
+    if (!isMatch) {
+      throw new InternalServerErrorException(Message.WRONG_PASSWORD);
     }
     return response;
   }
