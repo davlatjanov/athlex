@@ -11,7 +11,7 @@ export class AdminService {
     return 'getAllMembersByAdmin executed';
   }
 
-  public async updateMemberByAdmin(): Promise<string> {
+  public async updateMembersByAdmin(): Promise<string> {
     return 'updateMemberByAdmin executed';
   }
 }
