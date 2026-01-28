@@ -1,11 +1,12 @@
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AdminService } from './admin.service';
-import { Member } from '../../libs/dto/member/member';
+import { Member, Members } from '../../libs/dto/member/member';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { MembersInquiry } from '../../libs/dto/member/member.input';
 
 @Resolver()
 export class AdminResolver {
@@ -13,10 +14,12 @@ export class AdminResolver {
 
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
-  @Query(() => String)
-  public async getAllMembersByAdmin(): Promise<string> {
-    console.log('Query getAllMembersByAdmin');
-    return await this.adminService.getAllMembersByAdmin();
+  @Query(() => Members)
+  public async getAllMembersByAdmin(
+    @Args('input') input: MembersInquiry,
+  ): Promise<Members> {
+    console.log('Query: getAllMembersByAdmin');
+    return await this.adminService.getAllMembersByAdmin(input);
   }
 
   @Mutation(() => String)

@@ -12,3 +12,9 @@ export const availableTrainerSorts = [
 ];
 
 export const availableCommentSorts = ['createdAt', 'updatedAt'];
+export const availableMemberSorts = [
+  'createdAt',
+  'updatedAt',
+  'memberLikes',
+  'memberViews',
+];
