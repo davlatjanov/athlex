@@ -5,6 +5,7 @@ import { Member, Members } from '../../libs/dto/member/member';
 import { MembersInquiry } from '../../libs/dto/member/member.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 @Injectable()
 export class AdminService {
@@ -43,7 +44,13 @@ export class AdminService {
 
     return result[0];
   }
-  public async updateMembersByAdmin(): Promise<string> {
-    return 'updateMemberByAdmin executed';
+
+  public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
+    const result = await this.memberModel
+      .findOneAndUpdate({ _id: input._id }, input, { new: true })
+      .exec();
+
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    return result;
   }
 }

@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { MembersInquiry } from '../../libs/dto/member/member.input';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 @Resolver()
 export class AdminResolver {
@@ -22,9 +23,13 @@ export class AdminResolver {
     return await this.adminService.getAllMembersByAdmin(input);
   }
 
-  @Mutation(() => String)
-  public async updateMembersByAdmin(): Promise<string> {
-    console.log('Mutation updateMemberByAdmin');
-    return await this.adminService.updateMembersByAdmin();
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Member)
+  public async updateMemberByAdmin(
+    @Args('input') input: MemberUpdate,
+  ): Promise<Member> {
+    console.log('Mutation: updateMemberByAdmin');
+    return await this.adminService.updateMemberByAdmin(input);
   }
 }
