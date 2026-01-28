@@ -4,62 +4,22 @@ import { Model, ObjectId } from 'mongoose';
 import { View } from '../../libs/dto/view/view';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { T } from '../../libs/types/common';
-import { OrdinaryInqury } from '../../libs/dto/property/property.input';
-import { ViewGroup } from '../../libs/enums/view.enum';
-import { Properties } from '../../libs/dto/property/property';
-import { lookUpVisited } from '../../libs/config';
 
 @Injectable()
 export class ViewService {
-	constructor(@InjectModel('View') private readonly viewModel: Model<View>) {}
+  constructor(@InjectModel('View') private readonly viewModel: Model<View>) {}
 
-	public async recordView(input: ViewInput): Promise<View | null> {
-		const viewExist = await this.checkViewExistance(input);
-		if (!viewExist) {
-			console.log('NEW VIEW INSTERTION');
-			return await this.viewModel.create(input);
-		} else return null;
-	}
+  public async recordView(input: ViewInput): Promise<View | null> {
+    const viewExist = await this.checkViewExistance(input);
+    if (!viewExist) {
+      console.log('NEW VIEW INSTERTION');
+      return await this.viewModel.create(input);
+    } else return null;
+  }
 
-	private async checkViewExistance(input: ViewInput): Promise<View | null> {
-		const { memberId, viewRefId } = input;
-		const search: T = { memberId: memberId, viewRefId: viewRefId };
-		return await this.viewModel.findOne(search).exec();
-	}
-
-	public async getVisited(memberId: ObjectId, input: OrdinaryInqury): Promise<Properties> {
-		const { page, limit } = input;
-		const match: T = { viewGroup: ViewGroup.PROPERTY, memberId: memberId };
-		const data: T = await this.viewModel
-			.aggregate([
-				{ $match: match },
-				{ $sort: { updateAt: -1 } },
-				{
-					$lookup: {
-						from: 'properties',
-						localField: 'viewRefId',
-						foreignField: '_id',
-						as: 'visitedProperty',
-					},
-				},
-				{ $unwind: '$visitedProperty' },
-				{
-					$facet: {
-						list: [
-							{ $skip: (page - 1) * limit }, //
-							{ $limit: limit },
-							lookUpVisited,
-							{ $unwind: '$visitedProperty.memberData' },
-						],
-						metaCounter: [{ $count: 'total' }],
-					},
-				},
-			])
-			.exec();
-		console.log('data', data);
-
-		const result: Properties = { list: [], metaCounter: data[0].metaCounter };
-		result.list = data[0].list.map((ele) => ele.visitedProperty);
-		return result;
-	}
+  private async checkViewExistance(input: ViewInput): Promise<View | null> {
+    const { memberId, viewRefId } = input;
+    const search: T = { memberId: memberId, viewRefId: viewRefId };
+    return await this.viewModel.findOne(search).exec();
+  }
 }

@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { Member } from '../../libs/dto/member/member';
-import { Message } from '../../libs/enums/common.enum';
-import { MemberStatus } from '../../libs/enums/member.enum';
+import {
+  LoginInput,
+  MemberInput,
+  TrainersInquiry,
+} from '../../libs/dto/member/member.input';
+import { Member, Members } from '../../libs/dto/member/member';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { shapeIntoMongoObjectId } from '../../libs/config';
@@ -116,5 +120,44 @@ export class MemberService {
       }
     }
     return targetMember;
+  }
+
+  public async getTrainers(
+    memberId: ObjectId,
+    input: TrainersInquiry,
+  ): Promise<Members> {
+    //@ts-ignore
+    const { text } = input.search;
+    const match: T = {
+      memberType: MemberType.TRAINER,
+      memberStatus: MemberStatus.ACTIVE,
+    };
+
+    const sort: T = {
+      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
+    };
+
+    if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+
+    const result = await this.memberModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
+
+    return result[0];
   }
 }
