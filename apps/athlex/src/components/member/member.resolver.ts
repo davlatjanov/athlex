@@ -13,7 +13,15 @@ import type { ObjectId } from 'mongoose';
 import type { T } from '../../libs/types/common';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { WithoutGuard } from '../auth/guards/without.guard';
-import { shapeIntoMongoObjectId } from '../../libs/config';
+import {
+  getSerialForCloudinary,
+  shapeIntoMongoObjectId,
+  validMimeTypes,
+} from '../../libs/config';
+
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { uploadToCloudinary } from '../../libs/utils/cloudinary-uploader';
+import { Message } from '../../libs/enums/common.enum';
 
 @Resolver()
 export class MemberResolver {
@@ -73,5 +81,78 @@ export class MemberResolver {
   ): Promise<Members> {
     console.log('Query getAgents');
     return this.memberService.getTrainers(memberId, input);
+  }
+
+  //UPLOADER
+  @UseGuards(AuthGuard)
+  @Mutation(() => String)
+  public async imageUploader(
+    @Args({ name: 'file', type: () => GraphQLUpload })
+    { createReadStream, filename, mimetype }: FileUpload,
+    @Args('target') target: string, // e.g., "members", "products"
+  ): Promise<string> {
+    console.log('Mutation: imageUploader');
+
+    if (!filename) throw new Error(Message.UPLOAD_FAILED);
+
+    const validMime = validMimeTypes.includes(mimetype);
+    if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+
+    // Generate unique filename (without extension)
+    const imageName = getSerialForCloudinary(filename);
+
+    // Get stream
+    const stream = createReadStream();
+
+    try {
+      // Upload to Cloudinary
+      const cloudinaryUrl = await uploadToCloudinary(stream, target, imageName);
+
+      // Returns: "https://res.cloudinary.com/your-cloud/image/upload/v1/members/uuid-123.jpg"
+      return cloudinaryUrl;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw new Error(Message.UPLOAD_FAILED);
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => [String])
+  public async imagesUploader(
+    @Args('files', { type: () => [GraphQLUpload] })
+    files: Promise<FileUpload>[],
+    @Args('target') target: string, // e.g., "products"
+  ): Promise<string[]> {
+    console.log('Mutation: imagesUploader');
+
+    const uploadedImages: string[] = [];
+
+    const promisedList = files.map(
+      async (img: Promise<FileUpload>, index: number) => {
+        try {
+          const { filename, mimetype, createReadStream } = await img;
+
+          const validMime = validMimeTypes.includes(mimetype);
+          if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+
+          const imageName = getSerialForCloudinary(filename);
+          const stream = createReadStream();
+
+          // Upload to Cloudinary
+          const cloudinaryUrl = await uploadToCloudinary(
+            stream,
+            target,
+            imageName,
+          );
+
+          uploadedImages[index] = cloudinaryUrl;
+        } catch (err) {
+          console.log('Error uploading file:', err);
+        }
+      },
+    );
+
+    await Promise.all(promisedList);
+    return uploadedImages;
   }
 }
