@@ -21,6 +21,7 @@ const ProductSchema = new Schema(
       enum: ProductStatus,
       default: ProductStatus.ACTIVE,
     },
+
     productType: {
       type: String,
       enum: ProductType,
@@ -40,10 +41,12 @@ const ProductSchema = new Schema(
     productImages: {
       type: [String],
       required: true,
+      default: [''],
     },
 
     productDesc: {
       type: String,
+      default: 'NO DESCRIPTION',
     },
 
     productViews: {

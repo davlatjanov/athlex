@@ -89,7 +89,8 @@ export class MemberResolver {
   public async imageUploader(
     @Args({ name: 'file', type: () => GraphQLUpload })
     { createReadStream, filename, mimetype }: FileUpload,
-    @Args('target') target: string, // e.g., "members", "products"
+    @Args('target') target: string,
+    @AuthMember('_id') memberId: ObjectId,
   ): Promise<string> {
     console.log('Mutation: imageUploader');
 
@@ -108,7 +109,9 @@ export class MemberResolver {
       // Upload to Cloudinary
       const cloudinaryUrl = await uploadToCloudinary(stream, target, imageName);
 
-      // Returns: "https://res.cloudinary.com/your-cloud/image/upload/v1/members/uuid-123.jpg"
+      await this.memberService.updateMember(memberId, {
+        memberImage: cloudinaryUrl,
+      });
       return cloudinaryUrl;
     } catch (error) {
       console.error('Upload error:', error);

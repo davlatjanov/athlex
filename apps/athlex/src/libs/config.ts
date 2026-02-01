@@ -1,13 +1,11 @@
 import { ObjectId } from 'bson';
+import { v4 as uuidv4 } from 'uuid';
 
 export const shapeIntoMongoObjectId = (target: any) => {
   return typeof target === 'string' ? new ObjectId(target) : target;
 };
 
 /**  IMAGE CONFIGURATION **/
-import { v4 as uuidv4 } from 'uuid';
-import * as path from 'path';
-import { pipeline } from 'stream';
 
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 export const getSerialForCloudinary = (filename: string) => {

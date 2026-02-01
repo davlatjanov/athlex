@@ -72,7 +72,7 @@ export class MemberService {
 
   public async updateMember(
     memberId: ObjectId,
-    input: MemberUpdate,
+    input: MemberUpdate | T,
   ): Promise<Member> {
     const objId = shapeIntoMongoObjectId(memberId);
     const updatedData = await this.memberModel
