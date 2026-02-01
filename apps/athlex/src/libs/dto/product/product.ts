@@ -5,6 +5,7 @@ import {
   ProductStatus,
   ProductType,
 } from '../../enums/product.enum';
+import { TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Product {
@@ -46,4 +47,13 @@ export class Product {
 
   @Field(() => Date)
   updatedAt?: Date;
+}
+
+@ObjectType()
+export class Products {
+  @Field(() => [Product])
+  list: Product[];
+
+  @Field(() => [TotalCounter], { nullable: true })
+  metaCounter: TotalCounter[];
 }

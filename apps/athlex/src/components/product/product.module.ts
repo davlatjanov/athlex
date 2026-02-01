@@ -5,6 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import ProductSchema from '../../schemas/Product.schema';
 import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
+import { Member } from '../../libs/dto/member/member';
+import { MemberModule } from '../member/member.module';
 
 @Module({
   imports: [
