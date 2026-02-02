@@ -1,12 +1,20 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
-import { ProductBrand, ProductType } from '../../enums/product.enum';
+import {
+  ProductBrand,
+  ProductStatus,
+  ProductType,
+} from '../../enums/product.enum';
 
 @InputType()
 export class ProductUpdateInput {
   @IsOptional()
   @Field(() => String)
   _id?: string;
+
+  @IsOptional()
+  @Field(() => ProductStatus)
+  productStatus?: ProductStatus;
 
   @IsOptional()
   @Length(3, 12)

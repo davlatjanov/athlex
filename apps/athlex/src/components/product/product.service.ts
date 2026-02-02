@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Product, Products } from '../../libs/dto/product/product';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
@@ -74,5 +74,17 @@ export class ProductService {
     }
 
     return updatedProduct;
+  }
+
+  public async deleteProduct(input: ObjectId): Promise<Product | null> {
+    const deletedProduct = await this.productModel.findOneAndDelete({
+      _id: input,
+      productStatus: ProductStatus.STOPPED,
+    });
+
+    if (!deletedProduct) {
+      throw new InternalServerErrorException(Message.REMOVE_FAILED);
+    }
+    return deletedProduct;
   }
 }

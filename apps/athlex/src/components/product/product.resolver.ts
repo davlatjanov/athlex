@@ -53,4 +53,15 @@ export class ProductResolver {
 
     return await this.productService.updateProduct(input);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Product)
+  public async deleteProduct(
+    @Args('productId') productId: string,
+  ): Promise<Product | null> {
+    console.log('Mutation deteleProduct');
+    const _id = shapeIntoMongoObjectId(productId);
+    return await this.productService.deleteProduct(_id);
+  }
 }

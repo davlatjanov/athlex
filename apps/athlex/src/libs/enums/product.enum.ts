@@ -10,8 +10,8 @@ export enum ProductType {
 
 export enum ProductStatus {
   ACTIVE = 'ACTIVE',
+  STOPPED = 'STOPPED',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
-  DISCONTINUED = 'DISCONTINUED',
 }
 
 export enum ProductBrand {
