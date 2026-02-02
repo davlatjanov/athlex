@@ -12,6 +12,7 @@ import { T } from '../../libs/types/common';
 import { ProductStatus } from '../../libs/enums/product.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { ProductUpdateInput } from '../../libs/dto/product/product.update';
+import { ViewGroup } from '../../libs/enums/view.enum';
 
 @Injectable()
 export class ProductService {
@@ -57,6 +58,45 @@ export class ProductService {
     return activeProducts[0];
   }
 
+  public async getOneProduct(
+    productId: ObjectId,
+    memberId: ObjectId,
+  ): Promise<Product | null> {
+    const search: T = {
+      _id: productId,
+      productStatus: {
+        $in: [ProductStatus.ACTIVE, ProductStatus.OUT_OF_STOCK],
+      },
+    };
+    const targetProduct = await this.productModel.findOne(search).lean().exec();
+
+    if (!targetProduct) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
+
+    if (memberId) {
+      const viewInput = {
+        memberId: memberId,
+        viewRefId: productId,
+        viewGroup: ViewGroup.PRODUCT,
+      };
+      const newView = await this.viewService.recordView(viewInput);
+
+      if (newView) {
+        await this.productModel
+          .findOneAndUpdate(
+            search,
+            { $inc: { productViews: 1 } },
+            { new: true },
+          )
+          .exec();
+        targetProduct.productViews = (targetProduct.productViews ?? 0) + 1;
+      }
+    }
+
+    return targetProduct;
+  }
+
   public async updateProduct(input: ProductUpdateInput): Promise<Product> {
     const updatedProduct = await this.productModel
       .findOneAndUpdate(
@@ -77,10 +117,12 @@ export class ProductService {
   }
 
   public async deleteProduct(input: ObjectId): Promise<Product | null> {
-    const deletedProduct = await this.productModel.findOneAndDelete({
-      _id: input,
-      productStatus: ProductStatus.STOPPED,
-    });
+    const deletedProduct = await this.productModel
+      .findOneAndDelete({
+        _id: input,
+        productStatus: ProductStatus.STOPPED,
+      })
+      .exec();
 
     if (!deletedProduct) {
       throw new InternalServerErrorException(Message.REMOVE_FAILED);

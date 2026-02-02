@@ -43,6 +43,16 @@ export class ProductResolver {
     return await this.productService.getProducts(input);
   }
 
+  @UseGuards(WithoutGuard)
+  @Query(() => Product)
+  public async getOneProduct(
+    @Args('productId') id: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Product | null> {
+    console.log('QUERY getOneProduct');
+    const productId = shapeIntoMongoObjectId(id);
+    return await this.productService.getOneProduct(productId, memberId);
+  }
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Mutation(() => Product)
