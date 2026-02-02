@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, Products } from '../../libs/dto/product/product';
@@ -10,7 +10,8 @@ import {
 } from '../../libs/dto/product/product.input';
 import { T } from '../../libs/types/common';
 import { ProductStatus } from '../../libs/enums/product.enum';
-import { Direction } from '../../libs/enums/common.enum';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { ProductUpdateInput } from '../../libs/dto/product/product.update';
 
 @Injectable()
 export class ProductService {
@@ -49,7 +50,29 @@ export class ProductService {
         },
       ])
       .exec();
+    if (!activeProducts.length) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
 
     return activeProducts[0];
+  }
+
+  public async updateProduct(input: ProductUpdateInput): Promise<Product> {
+    const updatedProduct = await this.productModel
+      .findOneAndUpdate(
+        {
+          _id: input._id,
+        },
+        input,
+        { new: true },
+      )
+      .lean()
+      .exec();
+
+    if (!updatedProduct) {
+      throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    }
+
+    return updatedProduct;
   }
 }

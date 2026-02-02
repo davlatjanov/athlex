@@ -19,6 +19,7 @@ import { Product, Products } from '../../libs/dto/product/product';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
+import { ProductUpdateInput } from '../../libs/dto/product/product.update';
 
 @Resolver()
 export class ProductResolver {
@@ -40,5 +41,16 @@ export class ProductResolver {
   ): Promise<Products> {
     console.log('QUERY getProducts');
     return await this.productService.getProducts(input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Product)
+  public async updateProduct(
+    @Args('input') input: ProductUpdateInput,
+  ): Promise<Product> {
+    console.log('Mutation updateProduct');
+
+    return await this.productService.updateProduct(input);
   }
 }
