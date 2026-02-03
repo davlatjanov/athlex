@@ -74,4 +74,14 @@ export class ProductResolver {
     const _id = shapeIntoMongoObjectId(productId);
     return await this.productService.deleteProduct(_id);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Query(() => Products)
+  public async getAllProducts(
+    @Args('input') input: ProductsInquiry,
+  ): Promise<Products> {
+    console.log('QUERY getAllProducts');
+    return await this.productService.getAllProducts(input);
+  }
 }

@@ -9,11 +9,11 @@ import {
 @InputType()
 export class ProductUpdateInput {
   @IsOptional()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   _id?: string;
 
   @IsOptional()
-  @Field(() => ProductStatus)
+  @Field(() => ProductStatus, { nullable: true })
   productStatus?: ProductStatus;
 
   @IsOptional()
