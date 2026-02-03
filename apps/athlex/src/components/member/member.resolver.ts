@@ -65,12 +65,12 @@ export class MemberResolver {
   @UseGuards(WithoutGuard)
   @Query(() => Member)
   public async getMember(
-    @Args('memberId') input: string,
-    @AuthMember('_id') memberId: ObjectId,
+    @Args('memberId') targetId: string, // ✅ Clearer name
+    @AuthMember('_id') memberId: ObjectId, // Current user
   ): Promise<Member> {
     console.log('Query getMember');
-    const targetId = shapeIntoMongoObjectId(input);
-    return this.memberService.getMember(memberId, targetId);
+    const targetObjectId = shapeIntoMongoObjectId(targetId);
+    return this.memberService.getMember(memberId, targetObjectId);
   }
 
   @UseGuards(WithoutGuard)

@@ -126,8 +126,6 @@ export class MemberService {
     memberId: ObjectId,
     input: TrainersInquiry,
   ): Promise<Members> {
-    //@ts-ignore
-    const { text } = input.search;
     const match: T = {
       memberType: MemberType.TRAINER,
       memberStatus: MemberStatus.ACTIVE,
@@ -137,7 +135,9 @@ export class MemberService {
       [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
     };
 
-    if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+    if (input.search?.text) {
+      match.memberNick = { $regex: new RegExp(input.search.text, 'i') };
+    }
 
     const result = await this.memberModel
       .aggregate([

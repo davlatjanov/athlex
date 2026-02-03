@@ -75,7 +75,7 @@ export class TrainersInquiry {
   direction?: Direction;
 
   @IsOptional()
-  @Field(() => TISearch)
+  @Field(() => TISearch, { nullable: true })
   search?: TISearch;
 }
 
@@ -89,7 +89,7 @@ class MISearch {
   @Field(() => MemberType, { nullable: true })
   memberType?: MemberType;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Field(() => String, { nullable: true })
   text?: string;
 }
@@ -115,7 +115,7 @@ export class MembersInquiry {
   @Field(() => Direction, { nullable: true })
   direction?: Direction;
 
-  @IsNotEmpty()
-  @Field(() => MISearch)
-  search: MISearch;
+  @IsOptional()
+  @Field(() => MISearch, { nullable: true })
+  search?: MISearch;
 }
