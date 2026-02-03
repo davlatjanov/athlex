@@ -4,7 +4,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { FollowService } from './follow.service';
-import { Follow } from '../../libs/dto/follow/follow';
+import { Follow, FollowingLikes } from '../../libs/dto/follow/follow';
 import { FollowInput, FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { Followers } from '../../libs/dto/follow/followers';
 import { Followings } from '../../libs/dto/follow/followings';
@@ -46,5 +46,15 @@ export class FollowResolver {
     console.log('Query: getFollowings');
     const targetId = shapeIntoMongoObjectId(memberId);
     return await this.followService.getFollowings(targetId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => FollowingLikes)
+  public async getFollowingLikes(
+    @Args('input') input: FollowInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<FollowingLikes> {
+    console.log('Query: getFollowingLikes');
+    return await this.followService.getFollowingLikes(memberId, input);
   }
 }

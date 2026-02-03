@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { Follow } from '../../libs/dto/follow/follow';
+import { Follow, FollowingLikes } from '../../libs/dto/follow/follow';
 import { FollowInput, FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { Followers } from '../../libs/dto/follow/followers';
 import { Followings } from '../../libs/dto/follow/followings';
@@ -127,6 +127,98 @@ export class FollowService {
         {
           $replaceRoot: { newRoot: '$followingData' },
         },
+        {
+          $facet: {
+            list: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) {
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    }
+
+    return result[0];
+  }
+
+  public async getFollowingLikes(
+    memberId: ObjectId,
+    input: FollowInquiry,
+  ): Promise<FollowingLikes> {
+    const { page, limit } = input;
+
+    const result = await this.followModel
+      .aggregate([
+        // Get all people I follow
+        { $match: { followerId: memberId } },
+        {
+          $lookup: {
+            from: 'likes',
+            localField: 'followingId',
+            foreignField: 'memberId',
+            as: 'likes',
+          },
+        },
+        { $unwind: '$likes' },
+        // Get the actual liked items (products/programs/members)
+        {
+          $lookup: {
+            from: 'products',
+            localField: 'likes.likeRefId',
+            foreignField: '_id',
+            as: 'productData',
+          },
+        },
+        {
+          $lookup: {
+            from: 'programs',
+            localField: 'likes.likeRefId',
+            foreignField: '_id',
+            as: 'programData',
+          },
+        },
+        {
+          $lookup: {
+            from: 'members',
+            localField: 'likes.likeRefId',
+            foreignField: '_id',
+            as: 'memberData',
+          },
+        },
+        // Get follower info (person who liked)
+        {
+          $lookup: {
+            from: 'members',
+            localField: 'followingId',
+            foreignField: '_id',
+            as: 'followerInfo',
+          },
+        },
+        { $unwind: '$followerInfo' },
+        {
+          $project: {
+            _id: '$likes._id',
+            likeGroup: '$likes.likeGroup',
+            likedBy: '$followerInfo',
+            likedItem: {
+              $cond: {
+                if: { $gt: [{ $size: '$productData' }, 0] },
+                then: { $arrayElemAt: ['$productData', 0] },
+                else: {
+                  $cond: {
+                    if: { $gt: [{ $size: '$programData' }, 0] },
+                    then: { $arrayElemAt: ['$programData', 0] },
+                    else: { $arrayElemAt: ['$memberData', 0] },
+                  },
+                },
+              },
+            },
+            createdAt: '$likes.createdAt',
+          },
+        },
+        { $sort: { createdAt: -1 } },
         {
           $facet: {
             list: [{ $skip: (page - 1) * limit }, { $limit: limit }],
