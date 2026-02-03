@@ -37,7 +37,7 @@ export class CreateProductInput {
 }
 
 @InputType()
-export class PISearch {
+export class ProductSearch {
   @IsOptional()
   @Field(() => String, { nullable: true })
   productName?: string;
@@ -81,6 +81,6 @@ export class ProductsInquiry {
   direction?: Direction;
 
   @IsOptional()
-  @Field(() => PISearch, { nullable: true })
-  search?: PISearch;
+  @Field(() => ProductSearch, { nullable: true })
+  search?: ProductSearch;
 }

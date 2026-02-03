@@ -212,4 +212,15 @@ export class ProductService {
 
     return allProducts[0];
   }
+
+  public async updateProductByLike(
+    productId: ObjectId,
+    increment: number,
+  ): Promise<void> {
+    await this.productModel
+      .findByIdAndUpdate(productId, {
+        $inc: { productLikes: increment },
+      })
+      .exec();
+  }
 }

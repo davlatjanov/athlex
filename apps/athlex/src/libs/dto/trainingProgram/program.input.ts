@@ -26,7 +26,7 @@ export class ProgramInput {
 }
 
 @InputType()
-export class PISearch {
+export class ProgramSearch {
   @IsOptional()
   @Field(() => String, { nullable: true })
   programName?: string;
@@ -58,6 +58,6 @@ export class ProgramInquiry {
   direction?: Direction;
 
   @IsOptional()
-  @Field(() => PISearch, { nullable: true })
-  search?: PISearch;
+  @Field(() => ProgramSearch, { nullable: true })
+  search?: ProgramSearch;
 }

@@ -7,13 +7,13 @@ import { Program, Programs } from '../../libs/dto/trainingProgram/program';
 import {
   ProgramInput,
   ProgramInquiry,
-} from '../../libs/dto/trainingProgram/programInput';
+} from '../../libs/dto/trainingProgram/program.input';
 import { T } from '../../libs/types/common';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
-import { ProgramUpdate } from '../../libs/dto/trainingProgram/programUpdate';
+import { ProgramUpdate } from '../../libs/dto/trainingProgram/program.update';
 import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
 
 @Injectable()
@@ -326,5 +326,17 @@ export class TrainingProgramService {
     });
 
     return result;
+  }
+
+  // In training-program.service.ts
+  public async updateProgramByLike(
+    programId: ObjectId,
+    increment: number,
+  ): Promise<void> {
+    await this.programModel
+      .findByIdAndUpdate(programId, {
+        $inc: { programLikes: increment },
+      })
+      .exec();
   }
 }

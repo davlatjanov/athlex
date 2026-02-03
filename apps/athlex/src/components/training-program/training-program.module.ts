@@ -22,5 +22,6 @@ import ProgramEnrollmentSchema from '../../schemas/ProgramEnrollment.schema';
     MemberModule,
   ],
   providers: [TrainingProgramResolver, TrainingProgramService],
+  exports: [TrainingProgramService],
 })
 export class TrainingProgramModule {}

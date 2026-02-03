@@ -8,12 +8,12 @@ import { MemberType } from '../../libs/enums/member.enum';
 import {
   ProgramInput,
   ProgramInquiry,
-} from '../../libs/dto/trainingProgram/programInput';
+} from '../../libs/dto/trainingProgram/program.input';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
-import { ProgramUpdate } from '../../libs/dto/trainingProgram/programUpdate';
+import { ProgramUpdate } from '../../libs/dto/trainingProgram/program.update';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
 

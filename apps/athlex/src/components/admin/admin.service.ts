@@ -12,16 +12,26 @@ export class AdminService {
   constructor(@InjectModel('Member') private memberModel: Model<Member>) {}
 
   public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
-    const { memberStatus, memberType, text } = input.search;
     const match: T = {};
 
     const sort: T = {
       [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
     };
 
-    if (memberStatus) match.memberStatus = memberStatus;
-    if (memberType) match.memberType = memberType;
-    if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+    // ✅ Safe access with optional chaining
+    if (input.search?.memberStatus) {
+      match.memberStatus = input.search.memberStatus;
+    }
+
+    if (input.search?.memberType) {
+      match.memberType = input.search.memberType;
+    }
+
+    if (input.search?.text) {
+      match.memberNick = { $regex: new RegExp(input.search.text, 'i') };
+    }
+
+    console.log('match', match);
 
     const result = await this.memberModel
       .aggregate([
@@ -38,13 +48,13 @@ export class AdminService {
         },
       ])
       .exec();
+
     if (!result.length) {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     }
 
     return result[0];
   }
-
   public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
     const result = await this.memberModel
       .findOneAndUpdate({ _id: input._id }, input, { new: true })

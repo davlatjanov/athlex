@@ -160,4 +160,15 @@ export class MemberService {
 
     return result[0];
   }
+
+  public async updateMemberByLike(
+    memberId: ObjectId,
+    increment: number,
+  ): Promise<void> {
+    await this.memberModel
+      .findByIdAndUpdate(memberId, {
+        $inc: { memberLikes: increment },
+      })
+      .exec();
+  }
 }
