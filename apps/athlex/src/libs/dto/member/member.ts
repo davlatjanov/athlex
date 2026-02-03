@@ -81,15 +81,16 @@ export class Member {
 }
 
 @ObjectType()
-export class TotalCounter {
-  @Field(() => Int, { nullable: true })
-  total?: number;
-}
-@ObjectType()
 export class Members {
   @Field(() => [Member])
   list: Member[];
 
   @Field(() => [TotalCounter], { nullable: true })
   metaCounter: TotalCounter[];
+}
+
+@ObjectType()
+export class TotalCounter {
+  @Field(() => Int, { nullable: true })
+  total?: number;
 }

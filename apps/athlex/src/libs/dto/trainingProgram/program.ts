@@ -1,6 +1,7 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import type { ObjectId } from 'mongoose';
+import { TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Program {
@@ -10,10 +11,10 @@ export class Program {
   @Field(() => String)
   programName: string;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime)
   programStartDate: Date;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime)
   programEndDate: Date;
 
   @Field(() => Int)
@@ -39,4 +40,13 @@ export class Program {
 
   @Field(() => Date)
   updatedAt: Date;
+}
+
+@ObjectType()
+export class Programs {
+  @Field(() => [Program])
+  list: Program[];
+
+  @Field(() => [TotalCounter], { nullable: true })
+  metaCounter: TotalCounter[];
 }
