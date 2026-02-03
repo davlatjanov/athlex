@@ -34,3 +34,12 @@ export const availableProductSorts = [
   'productLikes',
   'productViews',
 ];
+
+export const lookupMember = {
+  $lookup: {
+    from: 'members',
+    localField: 'memberId',
+    foreignField: '_id',
+    as: 'memberData',
+  },
+};

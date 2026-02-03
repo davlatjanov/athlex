@@ -186,4 +186,15 @@ export class MemberService {
       })
       .exec();
   }
+
+  public async updateMemberByComment(
+    memberId: ObjectId,
+    increment: number,
+  ): Promise<void> {
+    await this.memberModel
+      .findByIdAndUpdate(memberId, {
+        $inc: { memberComments: increment },
+      })
+      .exec();
+  }
 }
