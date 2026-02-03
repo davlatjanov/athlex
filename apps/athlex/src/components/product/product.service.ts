@@ -36,6 +36,33 @@ export class ProductService {
     const sort: T = {
       [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
     };
+
+    // Search filters
+    if (input.search?.productName) {
+      match.productName = { $regex: new RegExp(input.search.productName, 'i') };
+    }
+
+    if (input.search?.productBrand) {
+      match.productBrand = input.search.productBrand;
+    }
+
+    if (input.search?.productType) {
+      match.productType = input.search.productType;
+    }
+
+    // Price range filter
+    if (input.search?.minPrice || input.search?.maxPrice) {
+      match.productPrice = {};
+      if (input.search.minPrice) {
+        match.productPrice.$gte = input.search.minPrice;
+      }
+      if (input.search.maxPrice) {
+        match.productPrice.$lte = input.search.maxPrice;
+      }
+    }
+
+    console.log('match', match);
+
     const activeProducts = await this.productModel
       .aggregate([
         { $match: match },
@@ -51,6 +78,7 @@ export class ProductService {
         },
       ])
       .exec();
+
     if (!activeProducts.length) {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     }

@@ -37,6 +37,29 @@ export class CreateProductInput {
 }
 
 @InputType()
+export class PISearch {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  productName?: string;
+
+  @IsOptional()
+  @Field(() => ProductBrand, { nullable: true })
+  productBrand?: ProductBrand;
+
+  @IsOptional()
+  @Field(() => ProductType, { nullable: true })
+  productType?: ProductType;
+
+  @IsOptional()
+  @Field(() => Int, { nullable: true })
+  minPrice?: number;
+
+  @IsOptional()
+  @Field(() => Int, { nullable: true })
+  maxPrice?: number;
+}
+
+@InputType()
 export class ProductsInquiry {
   @IsNotEmpty()
   @Min(1)
@@ -56,4 +79,8 @@ export class ProductsInquiry {
   @IsOptional()
   @Field(() => Direction, { nullable: true })
   direction?: Direction;
+
+  @IsOptional()
+  @Field(() => PISearch, { nullable: true })
+  search?: PISearch;
 }
