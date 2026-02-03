@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MemberModule } from './member/member.module';
 import { ProductModule } from './product/product.module';
-import { ProgressResultsModule } from './progress-results/progress-results.module';
+import { ProgressResultModule } from './progress-result/progress-result.module';
 import { TrainingProgramModule } from './training-program/training-program.module';
 
 import { ViewModule } from './view/view.module';
@@ -17,7 +17,7 @@ import { AdminModule } from './admin/admin.module';
   imports: [
     MemberModule,
     ProductModule,
-    ProgressResultsModule,
+    ProgressResultModule,
     TrainingProgramModule,
     ViewModule,
     CommentModule,
