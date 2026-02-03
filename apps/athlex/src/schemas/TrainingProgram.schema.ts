@@ -21,6 +21,13 @@ const TrainingProgramSchema = new Schema(
     programDesc: {
       type: String,
     },
+
+    programImages: {
+      type: [String],
+      required: true,
+      default: [],
+    },
+
     programViews: {
       type: Number,
       default: 0,
@@ -35,7 +42,7 @@ const TrainingProgramSchema = new Schema(
       ref: 'MEMBER',
     },
   },
-  { timestamps: true, collection: 'training_programs' },
+  { timestamps: true, collection: 'programs' },
 );
 
 export default TrainingProgramSchema;
