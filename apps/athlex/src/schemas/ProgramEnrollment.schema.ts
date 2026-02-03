@@ -5,7 +5,7 @@ const ProgramEnrollmentSchema = new Schema(
     memberId: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'MEMBER',
+      ref: 'Member', // ✅ Changed from 'MEMBER'
     },
     programId: {
       type: Schema.Types.ObjectId,

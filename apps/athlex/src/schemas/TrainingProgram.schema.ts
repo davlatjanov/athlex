@@ -21,13 +21,11 @@ const TrainingProgramSchema = new Schema(
     programDesc: {
       type: String,
     },
-
     programImages: {
       type: [String],
       required: true,
       default: [],
     },
-
     programViews: {
       type: Number,
       default: 0,
@@ -39,10 +37,14 @@ const TrainingProgramSchema = new Schema(
     memberId: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'MEMBER',
+      ref: 'Member', // ✅ Changed from 'MEMBER'
     },
   },
   { timestamps: true, collection: 'programs' },
 );
+
+// ✅ Added indexes
+TrainingProgramSchema.index({ memberId: 1 });
+TrainingProgramSchema.index({ programStartDate: 1, programEndDate: 1 });
 
 export default TrainingProgramSchema;

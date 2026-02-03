@@ -8,39 +8,37 @@ const ProgressResultSchema = new Schema(
       required: true,
       ref: 'Member',
     },
-
-    trainingProgramRefId: {
+    programId: {
+      // ✅ Renamed from trainingProgramRefId
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'TrainingProgram',
+      ref: 'Program', // ✅ Match your collection name
     },
-
     trainerId: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'Member',
     },
-
     images: {
       type: [String],
-      required: true, // before / after
+      required: true,
     },
-
     content: {
       type: String,
       required: true,
     },
-
     status: {
       type: String,
       enum: ProgressResultStatus,
       default: ProgressResultStatus.ACTIVE,
     },
   },
-  {
-    timestamps: true,
-    collection: 'progressResults',
-  },
+  { timestamps: true, collection: 'progressResults' },
 );
+
+// ✅ Added indexes
+ProgressResultSchema.index({ memberId: 1 });
+ProgressResultSchema.index({ programId: 1 });
+ProgressResultSchema.index({ trainerId: 1 });
 
 export default ProgressResultSchema;

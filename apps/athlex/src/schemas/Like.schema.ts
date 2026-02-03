@@ -8,12 +8,10 @@ const LikeSchema = new Schema(
       enum: LikeGroup,
       required: true,
     },
-
     likeRefId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
-
     memberId: {
       type: Schema.Types.ObjectId,
       required: true,

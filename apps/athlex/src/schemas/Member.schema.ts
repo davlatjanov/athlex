@@ -34,6 +34,7 @@ const MemberSchema = new Schema(
 
     memberPlan: {
       type: String,
+      enum: MemberPlan,
     },
 
     memberPrograms: {
