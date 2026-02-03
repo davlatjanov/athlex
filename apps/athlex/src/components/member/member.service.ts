@@ -171,4 +171,19 @@ export class MemberService {
       })
       .exec();
   }
+
+  public async updateMemberByFollow(
+    memberId: ObjectId,
+    increment: number,
+    field: 'followers' | 'followings',
+  ): Promise<void> {
+    const updateField =
+      field === 'followers' ? 'memberFollowers' : 'memberFollowings';
+
+    await this.memberModel
+      .findByIdAndUpdate(memberId, {
+        $inc: { [updateField]: increment },
+      })
+      .exec();
+  }
 }
