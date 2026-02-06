@@ -13,6 +13,7 @@ import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
     AuthModule,
     AdminModule,
     BookmarkModule,
+    NotificationModule,
   ],
 })
 export class ComponentsModule {}
