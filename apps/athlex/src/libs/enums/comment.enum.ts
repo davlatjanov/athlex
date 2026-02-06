@@ -8,7 +8,7 @@ export enum CommentStatus {
 
 export enum CommentGroup {
   PRODUCT = 'PRODUCT',
-  TRAINING_PROGRAM = 'PROGRAM',
+  PROGRAM = 'PROGRAM',
   TRAINER = 'TRAINER',
 }
 

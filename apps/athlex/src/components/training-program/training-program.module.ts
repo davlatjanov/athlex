@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 import { MemberModule } from '../member/member.module';
 import ProgramEnrollmentSchema from '../../schemas/ProgramEnrollment.schema';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import ProgramEnrollmentSchema from '../../schemas/ProgramEnrollment.schema';
     AuthModule,
     ViewModule,
     MemberModule,
+    NotificationModule,
   ],
   providers: [TrainingProgramResolver, TrainingProgramService],
   exports: [TrainingProgramService],

@@ -12,13 +12,23 @@ import { MemberService } from '../member/member.service';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { T } from '../../libs/types/common';
 import { lookupMember } from '../../libs/config';
-import { CommentStatus } from '../../libs/enums/comment.enum';
+import { CommentGroup, CommentStatus } from '../../libs/enums/comment.enum';
+import { NotificationService } from '../notification/notification.service';
+import { ProductService } from '../product/product.service';
+import { TrainingProgramService } from '../training-program/training-program.service';
+import {
+  NotificationGroup,
+  NotificationType,
+} from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectModel('Comment') private commentModel: Model<Comment>,
     private readonly memberService: MemberService,
+    private readonly notificationService: NotificationService,
+    private readonly productService: ProductService,
+    private readonly trainingProgramService: TrainingProgramService,
   ) {}
 
   public async createComment(
@@ -39,8 +49,55 @@ export class CommentService {
 
     // Increment member comments count
     await this.memberService.updateMemberByComment(memberId, 1);
-
+    await this.createCommentNotification(memberId, input);
     return newComment;
+  }
+
+  private async createCommentNotification(
+    authorId: ObjectId,
+    input: CommentInput,
+  ): Promise<void> {
+    try {
+      let receiverId: ObjectId;
+      let notificationGroup: NotificationGroup;
+      let productId: string | undefined;
+      let programId: string | undefined;
+
+      switch (input.commentGroup) {
+        case CommentGroup.PRODUCT:
+          // Products don't have owners in your schema, skip notification
+          return;
+
+        case CommentGroup.PROGRAM:
+          const program = await this.trainingProgramService.getProgramById(
+            shapeIntoMongoObjectId(input.commentRefId),
+          );
+          receiverId = program.memberId;
+          notificationGroup = NotificationGroup.PROGRAM;
+          programId = input.commentRefId;
+          break;
+
+        default:
+          return;
+      }
+
+      // Don't notify yourself
+      if (authorId.toString() === receiverId.toString()) {
+        return;
+      }
+
+      await this.notificationService.createNotification(authorId, {
+        notificationType: NotificationType.COMMENT,
+        notificationGroup,
+        notificationTitle: 'commented on your program',
+        notificationDesc: input.commentContent.substring(0, 100), // First 100 chars
+        receiverId: receiverId.toString(),
+        productId,
+        programId,
+      });
+    } catch (error) {
+      console.error('Failed to create comment notification:', error);
+    }
   }
 
   public async updateComment(

@@ -9,6 +9,11 @@ import { MemberService } from '../member/member.service';
 import { ProductService } from '../product/product.service';
 import { TrainingProgramService } from '../training-program/training-program.service';
 import { shapeIntoMongoObjectId } from '../../libs/config';
+import { NotificationService } from '../notification/notification.service';
+import {
+  NotificationGroup,
+  NotificationType,
+} from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class LikeService {
@@ -17,6 +22,7 @@ export class LikeService {
     private readonly memberService: MemberService,
     private readonly productService: ProductService,
     private readonly trainingProgramService: TrainingProgramService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async likeTargetItem(
@@ -53,7 +59,67 @@ export class LikeService {
       // Increment like count based on group
       await this.updateLikeCount(likeGroup, likeRefId, 1);
 
+      await this.createLikeNotification(memberId, likeGroup, likeRefId);
+
       return newLike;
+    }
+  }
+
+  private async createLikeNotification(
+    authorId: ObjectId,
+    likeGroup: LikeGroup,
+    likeRefId: string,
+  ): Promise<void> {
+    try {
+      let receiverId: ObjectId;
+      let notificationTitle: string;
+      let notificationGroup: NotificationGroup;
+      let productId: string | undefined;
+      let programId: string | undefined;
+
+      switch (likeGroup) {
+        case LikeGroup.MEMBER:
+          receiverId = shapeIntoMongoObjectId(likeRefId);
+          notificationTitle = 'liked your profile';
+          notificationGroup = NotificationGroup.MEMBER;
+          break;
+
+        case LikeGroup.PRODUCT:
+          // Get product to find owner (if you track product owners)
+          // For now, skip notification for products
+          return;
+
+        case LikeGroup.PROGRAM:
+          // Get program owner
+          const program = await this.trainingProgramService.getProgramById(
+            shapeIntoMongoObjectId(likeRefId),
+          );
+          receiverId = program.memberId;
+          notificationTitle = 'liked your program';
+          notificationGroup = NotificationGroup.PROGRAM;
+          programId = likeRefId;
+          break;
+
+        default:
+          return;
+      }
+
+      // Don't notify yourself
+      if (authorId.toString() === receiverId.toString()) {
+        return;
+      }
+
+      await this.notificationService.createNotification(authorId, {
+        notificationType: NotificationType.LIKE,
+        notificationGroup,
+        notificationTitle,
+        receiverId: receiverId.toString(),
+        productId,
+        programId,
+      });
+    } catch (error) {
+      // Don't fail the like operation if notification fails
+      console.error('Failed to create like notification:', error);
     }
   }
 
