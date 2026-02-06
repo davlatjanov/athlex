@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 import { NotificationModule } from './notification/notification.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotificationModule } from './notification/notification.module';
     AdminModule,
     BookmarkModule,
     NotificationModule,
+    ChatModule,
   ],
 })
 export class ComponentsModule {}
