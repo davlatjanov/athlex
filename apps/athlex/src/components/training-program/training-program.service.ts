@@ -15,11 +15,6 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ProgramUpdate } from '../../libs/dto/trainingProgram/program.update';
 import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
-import { NotificationService } from '../notification/notification.service';
-import {
-  NotificationGroup,
-  NotificationType,
-} from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class TrainingProgramService {
@@ -30,7 +25,6 @@ export class TrainingProgramService {
     private readonly authService: AuthService,
     private readonly viewService: ViewService,
     private readonly memberService: MemberService,
-    private readonly notificationService: NotificationService,
   ) {}
 
   public async createProgram(
@@ -300,21 +294,6 @@ export class TrainingProgramService {
     await this.programModel.findByIdAndUpdate(programId, {
       $inc: { programMembers: 1 },
     });
-
-    try {
-      // Don't notify if enrolling in own program
-      if (memberId.toString() !== program.memberId.toString()) {
-        await this.notificationService.createNotification(memberId, {
-          notificationType: NotificationType.PROGRAM_ENROLL,
-          notificationGroup: NotificationGroup.PROGRAM,
-          notificationTitle: 'enrolled in your program',
-          receiverId: program.memberId.toString(),
-          programId: programId,
-        });
-      }
-    } catch (error) {
-      console.error('Failed to create enrollment notification:', error);
-    }
 
     return enrollment;
   }

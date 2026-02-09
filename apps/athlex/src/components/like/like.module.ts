@@ -7,7 +7,6 @@ import { AuthModule } from '../auth/auth.module';
 import { MemberModule } from '../member/member.module';
 import { ProductModule } from '../product/product.module';
 import { TrainingProgramModule } from '../training-program/training-program.module';
-import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { NotificationModule } from '../notification/notification.module';
     MemberModule,
     ProductModule,
     TrainingProgramModule,
-    NotificationModule,
   ],
   providers: [LikeResolver, LikeService],
   exports: [LikeService],

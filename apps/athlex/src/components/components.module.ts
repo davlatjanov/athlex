@@ -13,8 +13,6 @@ import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
-import { NotificationModule } from './notification/notification.module';
-import { ChatModule } from './chat/chat.module';
 import { AIModule } from './ai/ai.module';
 
 @Module({
@@ -31,8 +29,6 @@ import { AIModule } from './ai/ai.module';
     AuthModule,
     AdminModule,
     BookmarkModule,
-    NotificationModule,
-    ChatModule,
     AIModule,
   ],
 })
