@@ -1,12 +1,28 @@
+// apps/athlex-batch/src/batch.controller.ts
 import { Controller, Get } from '@nestjs/common';
-import { AthlexBatchService } from './batch.service';
+import { BatchService } from './batch.service';
 
 @Controller()
-export class AthlexBatchController {
-  constructor(private readonly athlexBatchService: AthlexBatchService) {}
+export class BatchController {
+  constructor(private readonly batchService: BatchService) {}
 
   @Get()
-  getHello(): string {
-    return this.athlexBatchService.getHello();
+  getHealth(): object {
+    return {
+      status: 'running',
+      message: 'Athlex Batch Server is running',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Get('jobs')
+  getJobs(): object {
+    return this.batchService.getJobsStatus();
+  }
+
+  @Get('stats')
+  getStats(): object {
+    return this.batchService.getStats();
   }
 }
