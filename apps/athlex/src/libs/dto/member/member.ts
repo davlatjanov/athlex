@@ -71,6 +71,9 @@ export class Member {
   memberWarnings?: number;
 
   @Field(() => Date, { nullable: true })
+  lastLoginAt?: Date;
+
+  @Field(() => Date, { nullable: true })
   deletedAt?: Date;
 
   @Field(() => Date)

@@ -190,7 +190,7 @@ export class BatchService implements OnModuleInit {
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
       const result = await this.connection.collection('members').deleteMany({
-        memberStatus: 'DELETE',
+        memberStatus: 'DELETED',
         deletedAt: { $lt: ninetyDaysAgo },
       });
 
@@ -636,7 +636,7 @@ export class BatchService implements OnModuleInit {
       const deletedMembers = await this.connection
         .collection('members')
         .countDocuments({
-          memberStatus: 'DELETE',
+          memberStatus: 'DELETED',
           deletedAt: { $gte: oneWeekAgo },
         });
 

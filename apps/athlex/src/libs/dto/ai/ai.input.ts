@@ -1,6 +1,6 @@
 // libs/dto/ai/ai.input.ts
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, Length, MaxLength } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, Length, MaxLength } from 'class-validator';
 
 @InputType()
 export class AskAIInput {
@@ -17,7 +17,7 @@ export class AskAIInput {
 
 @InputType()
 export class AIChatMessage {
-  @IsNotEmpty()
+  @IsIn(['user', 'assistant'])
   @Field(() => String)
   role: string;
 

@@ -104,6 +104,10 @@ const MemberSchema = new Schema(
       type: Number,
       default: 0,
     },
+    lastLoginAt: {
+      type: Date,
+    },
+
     deletedAt: {
       type: Date,
     },
