@@ -1,6 +1,6 @@
 // libs/dto/ai/ai.input.ts
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, Length, MaxLength } from 'class-validator';
 
 @InputType()
 export class AskAIInput {
@@ -9,18 +9,20 @@ export class AskAIInput {
   @Field(() => String)
   question: string;
 
+  @IsOptional()
+  @MaxLength(300)
   @Field(() => String, { nullable: true })
   context?: string;
 }
 
 @InputType()
 export class AIChatMessage {
-  // ✅ Changed from ChatMessage to AIChatMessage
   @IsNotEmpty()
   @Field(() => String)
   role: string;
 
   @IsNotEmpty()
+  @MaxLength(2000)
   @Field(() => String)
   content: string;
 }
@@ -28,6 +30,10 @@ export class AIChatMessage {
 @InputType()
 export class ChatAIInput {
   @IsNotEmpty()
-  @Field(() => [AIChatMessage]) // ✅ Changed here too
+  @Field(() => [AIChatMessage])
   messages: AIChatMessage[];
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  conversationId?: string;
 }

@@ -8,6 +8,9 @@ import { AppResolver } from './app.resolver';
 import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { T } from './libs/types/common';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
 
 @Module({
   imports: [
@@ -15,6 +18,18 @@ import { T } from './libs/types/common';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 60,
+      },
+      {
+        name: 'ai',
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       playground: true,
@@ -28,7 +43,6 @@ import { T } from './libs/types/common';
             error?.extensions?.response?.message ||
             error?.message,
         };
-        console.log('GRAPHQL GLOBAL ERROR: ', graphQLFormattedError);
         return graphQLFormattedError;
       },
     }),
@@ -36,6 +50,13 @@ import { T } from './libs/types/common';
     DatabaseModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver],
+  providers: [
+    AppService,
+    AppResolver,
+    {
+      provide: APP_GUARD,
+      useClass: GqlThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
