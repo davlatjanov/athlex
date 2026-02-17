@@ -1,5 +1,4 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import type { ObjectId } from 'mongoose';
+import { Field, InputType } from '@nestjs/graphql';
 import {
   MemberAuthType,
   MemberStatus,
@@ -28,6 +27,10 @@ export class MemberUpdate {
   @IsOptional()
   @Field(() => String, { nullable: true })
   memberPhone: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  memberEmail?: string;
 
   @IsOptional()
   @Field(() => String, { nullable: true })

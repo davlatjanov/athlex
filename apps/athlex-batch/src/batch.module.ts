@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BatchController } from './batch.controller';
 import { BatchService } from './batch.service';
+import { EmailService } from './email.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { BatchService } from './batch.service';
     ScheduleModule.forRoot(),
   ],
   controllers: [BatchController],
-  providers: [BatchService],
+  providers: [BatchService, EmailService],
 })
 export class BatchModule {}

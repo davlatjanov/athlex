@@ -3,6 +3,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class BatchService implements OnModuleInit {
@@ -23,7 +24,10 @@ export class BatchService implements OnModuleInit {
     },
   };
 
-  constructor(@InjectConnection() private connection: Connection) {}
+  constructor(
+    @InjectConnection() private connection: Connection,
+    private readonly emailService: EmailService,
+  ) {}
 
   onModuleInit() {
     this.logger.log('✅ Batch Service Initialized');
@@ -231,15 +235,29 @@ export class BatchService implements OnModuleInit {
           .find({ programId: program._id })
           .toArray();
 
-        totalReminders += enrollments.length;
-        // TODO: Send emails here
+        const memberIds = enrollments.map((e) => e.memberId);
+        const members = await this.connection
+          .collection('members')
+          .find({ _id: { $in: memberIds }, memberEmail: { $exists: true, $ne: '' } })
+          .project({ memberEmail: 1, memberNick: 1, memberFullName: 1 })
+          .toArray();
+
+        for (const member of members) {
+          await this.emailService.sendProgramStartReminder({
+            to: member.memberEmail,
+            memberName: member.memberFullName ?? member.memberNick,
+            programName: program.programName,
+            programType: program.programType,
+          });
+          totalReminders++;
+        }
       }
 
       this.jobStats.reminders.lastRun = new Date();
       this.jobStats.reminders.successCount++;
 
       this.logger.log(
-        `✅ Would send ${totalReminders} program start reminders (${Date.now() - startTime}ms)`,
+        `✅ Sent ${totalReminders} program start reminders (${Date.now() - startTime}ms)`,
       );
     } catch (error) {
       this.jobStats.reminders.errorCount++;
@@ -274,15 +292,29 @@ export class BatchService implements OnModuleInit {
           .find({ programId: program._id })
           .toArray();
 
-        totalReminders += enrollments.length;
-        // TODO: Send emails here
+        const memberIds = enrollments.map((e) => e.memberId);
+        const members = await this.connection
+          .collection('members')
+          .find({ _id: { $in: memberIds }, memberEmail: { $exists: true, $ne: '' } })
+          .project({ memberEmail: 1, memberNick: 1, memberFullName: 1 })
+          .toArray();
+
+        for (const member of members) {
+          await this.emailService.sendProgramEndingReminder({
+            to: member.memberEmail,
+            memberName: member.memberFullName ?? member.memberNick,
+            programName: program.programName,
+            daysLeft: 3,
+          });
+          totalReminders++;
+        }
       }
 
       this.jobStats.reminders.lastRun = new Date();
       this.jobStats.reminders.successCount++;
 
       this.logger.log(
-        `✅ Would send ${totalReminders} program ending reminders (${Date.now() - startTime}ms)`,
+        `✅ Sent ${totalReminders} program ending reminders (${Date.now() - startTime}ms)`,
       );
     } catch (error) {
       this.jobStats.reminders.errorCount++;
@@ -304,15 +336,28 @@ export class BatchService implements OnModuleInit {
         .find({
           memberStatus: 'ACTIVE',
           lastLoginAt: { $lt: sevenDaysAgo },
+          memberEmail: { $exists: true, $ne: '' },
         })
+        .project({ memberEmail: 1, memberNick: 1, memberFullName: 1, lastLoginAt: 1 })
         .limit(100)
         .toArray();
+
+      for (const member of inactiveUsers) {
+        const daysSinceLogin = Math.floor(
+          (Date.now() - new Date(member.lastLoginAt).getTime()) / 86400000,
+        );
+        await this.emailService.sendInactivityReminder({
+          to: member.memberEmail,
+          memberName: member.memberFullName ?? member.memberNick,
+          daysSinceLogin,
+        });
+      }
 
       this.jobStats.reminders.lastRun = new Date();
       this.jobStats.reminders.successCount++;
 
       this.logger.log(
-        `✅ Would send reminders to ${inactiveUsers.length} inactive users (${Date.now() - startTime}ms)`,
+        `✅ Sent reminders to ${inactiveUsers.length} inactive users (${Date.now() - startTime}ms)`,
       );
     } catch (error) {
       this.jobStats.reminders.errorCount++;

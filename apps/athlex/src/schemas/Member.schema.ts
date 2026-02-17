@@ -32,6 +32,11 @@ const MemberSchema = new Schema(
       required: true,
     },
 
+    memberEmail: {
+      type: String,
+      index: { unique: true, sparse: true },
+    },
+
     memberPlan: {
       type: String,
       enum: MemberPlan,

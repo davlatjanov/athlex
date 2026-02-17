@@ -24,6 +24,9 @@ export class Member {
   memberPhone: string;
 
   @Field(() => String, { nullable: true })
+  memberEmail?: string;
+
+  @Field(() => String, { nullable: true })
   memberPlan: string;
 
   @Field(() => Int)
