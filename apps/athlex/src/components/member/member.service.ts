@@ -91,7 +91,7 @@ export class MemberService {
   }
 
   public async getMember(
-    memberId: ObjectId,
+    memberId: ObjectId | null,
     targetId: ObjectId,
   ): Promise<Member> {
     const search: T = {

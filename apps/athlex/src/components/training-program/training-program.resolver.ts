@@ -1,36 +1,29 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { TrainingProgramService } from './training-program.service';
-import { Program, Programs } from '../../libs/dto/trainingProgram/program';
+
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
-import {
-  ProgramInput,
-  ProgramInquiry,
-} from '../../libs/dto/trainingProgram/program.input';
+
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
-import { ProgramUpdate } from '../../libs/dto/trainingProgram/program.update';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
+import { Program, Programs } from '../../libs/dto/trainingProgram/program';
+import {
+  ProgramInput,
+  ProgramInquiry,
+  ProgramUpdate,
+} from '../../libs/dto/trainingProgram/program.input';
 
 @Resolver()
 export class TrainingProgramResolver {
   constructor(private readonly programService: TrainingProgramService) {}
 
-  @UseGuards(RolesGuard)
-  @Roles(MemberType.TRAINER)
-  @Mutation(() => Program)
-  public async createProgram(
-    @Args('input') input: ProgramInput,
-    @AuthMember('_id') memberId: ObjectId,
-  ): Promise<Program> {
-    console.log('Mutation createProgram');
-    return await this.programService.createProgram(input, memberId);
-  }
+  // ==================== QUERIES ====================
 
   @Query(() => Programs)
   public async getPrograms(
@@ -44,35 +37,40 @@ export class TrainingProgramResolver {
   @UseGuards(WithoutGuard)
   @Query(() => Program)
   public async getOneProgram(
-    @Args('programId') id: String,
+    @Args('programId') id: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Program> {
     console.log('Query: getOneProgram');
     const programId = shapeIntoMongoObjectId(id);
     return await this.programService.getOneProgram(memberId, programId);
   }
+  // libs/training-program/training-program.resolver.ts
 
-  @UseGuards(RolesGuard)
-  @Roles(MemberType.TRAINER)
-  @Mutation(() => Program)
-  public async updateProgram(
-    @Args('input') input: ProgramUpdate,
-    @Args('programId') programId: string,
+  @UseGuards(WithoutGuard)
+  @Query(() => Program)
+  public async getOneProgramWithMember(
+    @Args('programId') id: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Program> {
-    console.log('Mutation: updateProgram');
-    return await this.programService.updateProgram(memberId, programId, input);
+    console.log('Query: getOneProgramWithMember');
+    const programId = shapeIntoMongoObjectId(id);
+    return await this.programService.getOneProgramWithMember(
+      memberId,
+      programId,
+    );
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(MemberType.TRAINER)
-  @Mutation(() => Program)
-  public async deleteProgram(
+  @UseGuards(WithoutGuard)
+  @Query(() => Program)
+  public async getProgramWithWorkouts(
     @Args('programId') programId: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Program> {
-    console.log('Mutation: deleteProgram');
-    return await this.programService.deleteProgram(memberId, programId);
+    console.log('Query: getProgramWithWorkouts');
+    return await this.programService.getProgramWithWorkouts(
+      memberId,
+      programId,
+    );
   }
 
   @UseGuards(RolesGuard)
@@ -94,6 +92,42 @@ export class TrainingProgramResolver {
   ): Promise<Programs> {
     console.log('Query: getJoinedPrograms');
     return await this.programService.getJoinedPrograms(memberId, input);
+  }
+
+  // ==================== MUTATIONS ====================
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Mutation(() => Program)
+  public async createProgram(
+    @Args('input') input: ProgramInput,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Program> {
+    console.log('Mutation: createProgram');
+    return await this.programService.createProgram(memberId, input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Mutation(() => Program)
+  public async updateProgram(
+    @Args('programId') programId: string,
+    @Args('input') input: ProgramUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Program> {
+    console.log('Mutation: updateProgram');
+    return await this.programService.updateProgram(memberId, programId, input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Mutation(() => Program)
+  public async deleteProgram(
+    @Args('programId') programId: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Program> {
+    console.log('Mutation: deleteProgram');
+    return await this.programService.deleteProgram(memberId, programId);
   }
 
   @UseGuards(AuthGuard)
