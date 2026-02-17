@@ -66,6 +66,10 @@ export class MemberService {
       throw new InternalServerErrorException(Message.WRONG_PASSWORD);
     }
 
+    await this.memberModel
+      .findByIdAndUpdate(response._id, { lastLoginAt: new Date() })
+      .exec();
+
     response.accessToken = await this.authService.generateJwtToken(response);
     return response;
   }
