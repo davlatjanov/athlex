@@ -35,6 +35,14 @@ import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
       playground: true,
       uploads: false,
       autoSchemaFile: true,
+      context: ({ req, res, connection }) => {
+        // For subscriptions, connection context is used instead of req/res
+        if (connection) {
+          return { req: connection.context?.req || connection.context, res: connection.context?.res };
+        }
+        // For regular queries/mutations, use req/res
+        return { req, res };
+      },
       formatError: (error: T) => {
         const graphQLFormattedError = {
           code: error?.extensions?.code,

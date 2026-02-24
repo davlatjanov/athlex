@@ -148,7 +148,6 @@ export class ProductService {
     const deletedProduct = await this.productModel
       .findOneAndDelete({
         _id: input,
-        productStatus: ProductStatus.STOPPED,
       })
       .exec();
 
@@ -158,7 +157,9 @@ export class ProductService {
     return deletedProduct;
   }
 
-  public async getAllProducts(input: ProductsInquiry): Promise<Products> {
+  public async getAllProductsByAdmin(
+    input: ProductsInquiry,
+  ): Promise<Products> {
     const match: T = {}; // No status filter - get ALL products
     const sort: T = {
       [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,

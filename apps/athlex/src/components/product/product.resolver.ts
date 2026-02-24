@@ -78,10 +78,10 @@ export class ProductResolver {
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Query(() => Products)
-  public async getAllProducts(
+  public async getAllProductsByAdmin(
     @Args('input') input: ProductsInquiry,
   ): Promise<Products> {
     console.log('QUERY getAllProducts');
-    return await this.productService.getAllProducts(input);
+    return await this.productService.getAllProductsByAdmin(input);
   }
 }
