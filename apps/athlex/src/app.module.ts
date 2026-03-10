@@ -9,8 +9,6 @@ import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { T } from './libs/types/common';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
-import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
 
 @Module({
   imports: [
@@ -22,7 +20,7 @@ import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
       {
         name: 'default',
         ttl: 60000,
-        limit: 60,
+        limit: 60000,
       },
       {
         name: 'ai',
@@ -38,7 +36,10 @@ import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
       context: ({ req, res, connection }) => {
         // For subscriptions, connection context is used instead of req/res
         if (connection) {
-          return { req: connection.context?.req || connection.context, res: connection.context?.res };
+          return {
+            req: connection.context?.req || connection.context,
+            res: connection.context?.res,
+          };
         }
         // For regular queries/mutations, use req/res
         return { req, res };
@@ -61,10 +62,6 @@ import { GqlThrottlerGuard } from './libs/guards/gql-throttler.guard';
   providers: [
     AppService,
     AppResolver,
-    {
-      provide: APP_GUARD,
-      useClass: GqlThrottlerGuard,
-    },
   ],
 })
 export class AppModule {}
