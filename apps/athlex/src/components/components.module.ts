@@ -16,6 +16,8 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { AIModule } from './ai/ai.module';
 import { WorkoutModule } from './workout/workout.module';
 import { ExerciseModule } from './exercise/exercise.module';
+import { OrderModule } from './order/order.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -34,6 +36,9 @@ import { ExerciseModule } from './exercise/exercise.module';
     AIModule,
     WorkoutModule,
     ExerciseModule,
+    OrderModule,
+    NotificationModule,
   ],
 })
 export class ComponentsModule {}
+

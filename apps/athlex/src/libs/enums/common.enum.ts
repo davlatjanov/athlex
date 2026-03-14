@@ -21,6 +21,7 @@ export enum Message {
   SELF_SUBSCRIPTION_DENIED = 'Self subscription is denied!',
   DELETE_FAILED = 'DELETE_FAILED',
   ALREADY_JOINED = 'ALREADY_JOINED',
+  NOT_ALLOWED = 'NOT_ALLOWED',
 }
 
 export enum Direction {

@@ -1,10 +1,22 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import mongoose from 'mongoose';
 import {
   MemberAuthType,
   MemberStatus,
   MemberType,
 } from '../../enums/member.enum';
+
+@ObjectType()
+export class MemberSocial {
+  @Field(() => String, { nullable: true })
+  instagram?: string;
+
+  @Field(() => String, { nullable: true })
+  twitter?: string;
+
+  @Field(() => String, { nullable: true })
+  youtube?: string;
+}
 
 @ObjectType()
 export class Member {
@@ -45,6 +57,30 @@ export class Member {
 
   @Field(() => String, { nullable: true })
   memberDesc?: string;
+
+  @Field(() => String, { nullable: true })
+  memberBio?: string;
+
+  @Field(() => MemberSocial, { nullable: true })
+  memberSocial?: MemberSocial;
+
+  @Field(() => [String], { nullable: true })
+  memberSpecialties?: string[];
+
+  @Field(() => [String], { nullable: true })
+  memberCertifications?: string[];
+
+  @Field(() => Date, { nullable: true })
+  dateOfBirth?: Date;
+
+  @Field(() => String, { nullable: true })
+  memberGender?: string;
+
+  @Field(() => Float, { nullable: true })
+  memberHeight?: number;
+
+  @Field(() => Float, { nullable: true })
+  memberWeight?: number;
 
   @Field(() => Int)
   memberFollowers?: number;

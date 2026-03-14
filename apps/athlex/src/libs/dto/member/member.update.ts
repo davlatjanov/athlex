@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, Float, InputType } from '@nestjs/graphql';
 import {
   MemberAuthType,
   MemberStatus,
@@ -57,4 +57,32 @@ export class MemberUpdate {
   @IsOptional()
   @Field(() => String, { nullable: true })
   memberDesc?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  memberBio?: string;
+
+  @IsOptional()
+  @Field(() => [String], { nullable: true })
+  memberSpecialties?: string[];
+
+  @IsOptional()
+  @Field(() => [String], { nullable: true })
+  memberCertifications?: string[];
+
+  @IsOptional()
+  @Field(() => Date, { nullable: true })
+  dateOfBirth?: Date;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  memberGender?: string;
+
+  @IsOptional()
+  @Field(() => Float, { nullable: true })
+  memberHeight?: number;
+
+  @IsOptional()
+  @Field(() => Float, { nullable: true })
+  memberWeight?: number;
 }

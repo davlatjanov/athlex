@@ -1,6 +1,7 @@
 // apps/athlex-batch/src/batch.service.ts
+// All cron times are in UTC
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { EmailService } from './email.service';
@@ -119,7 +120,7 @@ export class BatchService implements OnModuleInit {
 
   // ==================== CLEANUP JOBS ====================
 
-  @Cron('0 2 * * *') // Daily at 2 AM
+  @Cron('0 2 * * *', { timeZone: 'UTC' }) // Daily at 2 AM UTC
   async cleanupOldViews() {
     this.logger.log('🧹 Starting: Cleanup Old Views');
     const startTime = Date.now();
@@ -144,7 +145,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 3 * * 0') // Sunday at 3 AM
+  @Cron('0 3 * * 0', { timeZone: 'UTC' }) // Sunday at 3 AM UTC
   async cleanupOrphanedRecords() {
     this.logger.log('🧹 Starting: Cleanup Orphaned Records');
     const startTime = Date.now();
@@ -180,7 +181,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 4 * * *') // Daily at 4 AM
+  @Cron('0 4 * * *', { timeZone: 'UTC' }) // Daily at 4 AM UTC
   async cleanupDeletedMembers() {
     this.logger.log('🧹 Starting: Cleanup Deleted Members');
     const startTime = Date.now();
@@ -208,7 +209,7 @@ export class BatchService implements OnModuleInit {
 
   // ==================== REMINDER JOBS ====================
 
-  @Cron('0 9 * * *') // Daily at 9 AM
+  @Cron('0 9 * * *', { timeZone: 'UTC' }) // Daily at 9 AM UTC
   async sendProgramStartReminders() {
     this.logger.log('📧 Starting: Program Start Reminders');
     const startTime = Date.now();
@@ -265,7 +266,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 10 * * *') // Daily at 10 AM
+  @Cron('0 10 * * *', { timeZone: 'UTC' }) // Daily at 10 AM UTC
   async sendProgramEndingReminders() {
     this.logger.log('📧 Starting: Program Ending Reminders');
     const startTime = Date.now();
@@ -322,7 +323,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 11 * * *') // Daily at 11 AM
+  @Cron('0 11 * * *', { timeZone: 'UTC' }) // Daily at 11 AM UTC
   async sendInactiveUserReminders() {
     this.logger.log('📧 Starting: Inactive User Reminders');
     const startTime = Date.now();
@@ -367,7 +368,7 @@ export class BatchService implements OnModuleInit {
 
   // ==================== ANALYTICS JOBS ====================
 
-  @Cron('0 1 * * *') // Daily at 1 AM
+  @Cron('0 1 * * *', { timeZone: 'UTC' }) // Daily at 1 AM UTC
   async calculateTrendingPrograms() {
     this.logger.log('📊 Starting: Calculate Trending Programs');
     const startTime = Date.now();
@@ -420,7 +421,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 2 * * *') // Daily at 2 AM (different from cleanup 2 AM due to seconds)
+  @Cron('30 2 * * *', { timeZone: 'UTC' }) // Daily at 2:30 AM UTC (offset from cleanup at 2 AM)
   async updatePopularityScores() {
     this.logger.log('📊 Starting: Update Popularity Scores');
     const startTime = Date.now();
@@ -454,7 +455,7 @@ export class BatchService implements OnModuleInit {
 
   // ==================== RECOMMENDATION JOBS ====================
 
-  @Cron('0 */6 * * *') // Every 6 hours
+  @Cron('0 */6 * * *', { timeZone: 'UTC' }) // Every 6 hours UTC
   async generatePersonalizedRecommendations() {
     this.logger.log('🎯 Starting: Personalized Recommendations');
     const startTime = Date.now();
@@ -495,7 +496,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 0 * * *') // Daily at midnight
+  @Cron('0 0 * * *', { timeZone: 'UTC' }) // Daily at midnight UTC
   async generateCollaborativeFiltering() {
     this.logger.log('🎯 Starting: Collaborative Filtering');
     const startTime = Date.now();
@@ -540,7 +541,7 @@ export class BatchService implements OnModuleInit {
 
   // ==================== MODERATION JOBS ====================
 
-  @Cron('0 */4 * * *') // Every 4 hours
+  @Cron('0 */4 * * *', { timeZone: 'UTC' }) // Every 4 hours UTC
   async scanInappropriateContent() {
     this.logger.log('🛡️ Starting: Scan Inappropriate Content');
     const startTime = Date.now();
@@ -587,7 +588,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 5 * * *') // Daily at 5 AM
+  @Cron('0 5 * * *', { timeZone: 'UTC' }) // Daily at 5 AM UTC
   async detectSpammers() {
     this.logger.log('🛡️ Starting: Detect Spammers');
     const startTime = Date.now();
@@ -617,7 +618,7 @@ export class BatchService implements OnModuleInit {
     }
   }
 
-  @Cron('0 6 * * 1') // Monday at 6 AM
+  @Cron('0 6 * * 1', { timeZone: 'UTC' }) // Monday at 6 AM UTC
   async generateModerationReport() {
     this.logger.log('📊 Starting: Weekly Moderation Report');
     const startTime = Date.now();

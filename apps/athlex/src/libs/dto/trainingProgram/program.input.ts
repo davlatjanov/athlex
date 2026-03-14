@@ -313,3 +313,110 @@ export class ProgramUpdate {
   @Field(() => [String], { nullable: true })
   requirements?: string[];
 }
+
+// ==================== WORKOUT UPDATE ====================
+@InputType()
+export class WorkoutUpdate {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  workoutName?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  workoutDesc?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Int, { nullable: true })
+  workoutDay?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Int, { nullable: true })
+  workoutDuration?: number;
+
+  @IsOptional()
+  @IsArray()
+  @Field(() => [BodyPart], { nullable: true })
+  bodyParts?: BodyPart[];
+
+  @IsOptional()
+  @Field(() => Boolean, { nullable: true })
+  isRestDay?: boolean;
+}
+
+// ==================== EXERCISE UPDATE ====================
+@InputType()
+export class ExerciseUpdate {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  exerciseName?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  exerciseDesc?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  exerciseVideo?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  exerciseGif?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  exerciseImage?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  primaryMuscle?: string;
+
+  @IsOptional()
+  @IsArray()
+  @Field(() => [String], { nullable: true })
+  secondaryMuscles?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Int, { nullable: true })
+  sets?: number;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  reps?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Int, { nullable: true })
+  restTime?: number;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  tempo?: string;
+
+  @IsOptional()
+  @IsArray()
+  @Field(() => [String], { nullable: true })
+  instructions?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @Field(() => [String], { nullable: true })
+  tips?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @Field(() => [Equipment], { nullable: true })
+  equipment?: Equipment[];
+
+  @IsOptional()
+  @IsEnum(ExerciseLevel)
+  @Field(() => ExerciseLevel, { nullable: true })
+  difficulty?: ExerciseLevel;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Int, { nullable: true })
+  orderInWorkout?: number;
+}

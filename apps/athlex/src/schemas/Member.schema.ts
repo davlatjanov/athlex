@@ -72,6 +72,43 @@ const MemberSchema = new Schema(
       type: String,
     },
 
+    memberBio: {
+      type: String,
+    },
+
+    memberSocial: {
+      instagram: { type: String, default: '' },
+      twitter: { type: String, default: '' },
+      youtube: { type: String, default: '' },
+    },
+
+    memberSpecialties: {
+      type: [String],
+      default: [],
+    },
+
+    memberCertifications: {
+      type: [String],
+      default: [],
+    },
+
+    dateOfBirth: {
+      type: Date,
+    },
+
+    memberGender: {
+      type: String,
+      enum: ['MALE', 'FEMALE', 'OTHER'],
+    },
+
+    memberHeight: {
+      type: Number, // in cm
+    },
+
+    memberWeight: {
+      type: Number, // in kg
+    },
+
     memberFollowers: {
       type: Number,
       default: 0,

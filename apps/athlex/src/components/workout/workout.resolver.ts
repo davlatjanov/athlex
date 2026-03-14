@@ -10,7 +10,10 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { Workout } from '../../libs/dto/trainingProgram/program';
-import { WorkoutInput } from '../../libs/dto/trainingProgram/program.input';
+import {
+  WorkoutInput,
+  WorkoutUpdate,
+} from '../../libs/dto/trainingProgram/program.input';
 
 @Resolver()
 export class WorkoutResolver {
@@ -33,5 +36,28 @@ export class WorkoutResolver {
   ): Promise<Workout[]> {
     console.log('Query: getWorkoutsByProgram');
     return await this.workoutService.getWorkoutsByProgram(programId);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Mutation(() => Workout)
+  public async updateWorkout(
+    @Args('workoutId') workoutId: string,
+    @Args('input') input: WorkoutUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Workout> {
+    console.log('Mutation: updateWorkout');
+    return await this.workoutService.updateWorkout(memberId, workoutId, input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Mutation(() => Workout)
+  public async deleteWorkout(
+    @Args('workoutId') workoutId: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Workout> {
+    console.log('Mutation: deleteWorkout');
+    return await this.workoutService.deleteWorkout(memberId, workoutId);
   }
 }
