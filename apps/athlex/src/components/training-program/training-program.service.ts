@@ -269,6 +269,15 @@ export class TrainingProgramService {
       throw new InternalServerErrorException(Message.UPDATE_FAILED);
     }
 
+    // Sync memberPrograms counter when status changes
+    if (input.programStatus && input.programStatus !== program.programStatus) {
+      if (input.programStatus === ProgramStatus.ARCHIVED && program.programStatus === ProgramStatus.ACTIVE) {
+        await this.memberService.updateMember(memberId, { $inc: { memberPrograms: -1 } });
+      } else if (input.programStatus === ProgramStatus.ACTIVE && program.programStatus === ProgramStatus.ARCHIVED) {
+        await this.memberService.updateMember(memberId, { $inc: { memberPrograms: 1 } });
+      }
+    }
+
     return result;
   }
 
