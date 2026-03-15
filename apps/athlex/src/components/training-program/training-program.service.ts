@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
 
@@ -91,6 +91,11 @@ export class TrainingProgramService {
     // Filter by status (for admin/trainer)
     if (input.programStatus) {
       match.programStatus = input.programStatus;
+    }
+
+    // Filter by specific trainer/member
+    if (input.memberId) {
+      match.memberId = new Types.ObjectId(input.memberId);
     }
 
     console.log('match', match);

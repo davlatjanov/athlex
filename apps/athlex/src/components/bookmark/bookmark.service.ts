@@ -10,7 +10,6 @@ import {
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { T } from '../../libs/types/common';
-import { BookmarkGroup } from '../../libs/enums/bookmark.enum';
 
 @Injectable()
 export class BookmarkService {
@@ -98,18 +97,33 @@ export class BookmarkService {
         {
           $project: {
             _id: 1,
+            bookmarkRefId: 1,
             bookmarkGroup: 1,
             createdAt: 1,
             itemData: {
               $cond: {
-                if: { $eq: ['$bookmarkGroup', BookmarkGroup.PRODUCT] },
-                then: { $arrayElemAt: ['$productData', 0] },
+                if: { $eq: ['$bookmarkGroup', 'PROGRAM'] },
+                then: {
+                  _id: { $arrayElemAt: ['$programData._id', 0] },
+                  name: { $arrayElemAt: ['$programData.programName', 0] },
+                  images: { $arrayElemAt: ['$programData.programImages', 0] },
+                  price: { $arrayElemAt: ['$programData.programPrice', 0] },
+                  type: { $arrayElemAt: ['$programData.programType', 0] },
+                  level: { $arrayElemAt: ['$programData.programLevel', 0] },
+                  views: { $arrayElemAt: ['$programData.programViews', 0] },
+                  likes: { $arrayElemAt: ['$programData.programLikes', 0] },
+                  members: { $arrayElemAt: ['$programData.programMembers', 0] },
+                  duration: { $arrayElemAt: ['$programData.programDuration', 0] },
+                  rank: { $arrayElemAt: ['$programData.programRank', 0] },
+                },
                 else: {
-                  $cond: {
-                    if: { $eq: ['$bookmarkGroup', BookmarkGroup.PROGRAM] },
-                    then: { $arrayElemAt: ['$programData', 0] },
-                    else: { $arrayElemAt: ['$progressResultData', 0] },
-                  },
+                  _id: { $arrayElemAt: ['$productData._id', 0] },
+                  name: { $arrayElemAt: ['$productData.productName', 0] },
+                  images: { $arrayElemAt: ['$productData.productImages', 0] },
+                  price: { $arrayElemAt: ['$productData.productPrice', 0] },
+                  type: { $arrayElemAt: ['$productData.productType', 0] },
+                  views: { $arrayElemAt: ['$productData.productViews', 0] },
+                  likes: { $arrayElemAt: ['$productData.productLikes', 0] },
                 },
               },
             },

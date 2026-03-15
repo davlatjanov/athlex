@@ -127,6 +127,11 @@ export class ProgramInquiry {
   @IsEnum(Direction)
   @Field(() => Direction, { nullable: true })
   direction?: Direction;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  memberId?: string;
 }
 
 // ==================== WORKOUT INPUT ====================
