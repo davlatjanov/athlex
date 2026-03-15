@@ -57,6 +57,16 @@ export class LikeService {
     }
   }
 
+  public async checkIfUserLiked(
+    memberId: ObjectId,
+    likeRefId: string,
+  ): Promise<boolean> {
+    const like = await this.likeModel
+      .findOne({ memberId, likeRefId: shapeIntoMongoObjectId(likeRefId) })
+      .exec();
+    return !!like;
+  }
+
   private async updateLikeCount(
     likeGroup: LikeGroup,
     likeRefId: string,

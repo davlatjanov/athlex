@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -19,5 +19,15 @@ export class LikeResolver {
   ): Promise<Like> {
     console.log('Mutation: likeTargetItem');
     return await this.likeService.likeTargetItem(memberId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => Boolean)
+  public async checkIfUserLiked(
+    @Args('likeRefId') likeRefId: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<boolean> {
+    console.log('Query: checkIfUserLiked');
+    return await this.likeService.checkIfUserLiked(memberId, likeRefId);
   }
 }
