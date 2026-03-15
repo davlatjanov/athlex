@@ -16,6 +16,8 @@ import { MemberService } from '../member/member.service';
 import { TrainingProgramService } from '../training-program/training-program.service';
 
 import { FeedbackGroup } from '../../libs/enums/feedback.enum';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class FeedbackService {
@@ -24,6 +26,7 @@ export class FeedbackService {
     private readonly productService: ProductService, // ✅ Add this
     private readonly trainingProgramService: TrainingProgramService, // ✅ Add this
     private readonly memberService: MemberService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async createFeedback(
@@ -51,6 +54,25 @@ export class FeedbackService {
     if (!newFeedback) {
       throw new InternalServerErrorException(Message.CREATE_FAILED);
     }
+
+    // Notify owner
+    try {
+      let recipientId: string | null = null;
+      if (input.feedbackGroup === FeedbackGroup.TRAINING_PROGRAM) {
+        const program = await this.trainingProgramService.getProgramById(shapeIntoMongoObjectId(input.feedbackRefId));
+        if (program) recipientId = program.memberId.toString();
+      }
+      if (recipientId && recipientId !== memberId.toString()) {
+        await this.notificationService.createNotification({
+          recipientId,
+          senderId: memberId.toString(),
+          notificationType: NotificationType.FEEDBACK_RECEIVED,
+          notificationTitle: 'New feedback received',
+          notificationMessage: (input.feedbackContent ?? '').slice(0, 80),
+          notificationLink: `/programs/${input.feedbackRefId}`,
+        });
+      }
+    } catch (_) {}
 
     return newFeedback;
   }

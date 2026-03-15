@@ -11,6 +11,8 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
 import { ProgramStatus } from '../../libs/enums/training-program.enum';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 import { Program, Programs } from '../../libs/dto/trainingProgram/program';
 import {
   ProgramInput,
@@ -27,6 +29,7 @@ export class TrainingProgramService {
     private readonly authService: AuthService,
     private readonly viewService: ViewService,
     private readonly memberService: MemberService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // ==================== CREATE PROGRAM ====================
@@ -449,6 +452,20 @@ export class TrainingProgramService {
     await this.programModel.findByIdAndUpdate(programId, {
       $inc: { programMembers: 1 },
     });
+
+    // Notify trainer
+    try {
+      if (program.memberId.toString() !== memberId.toString()) {
+        await this.notificationService.createNotification({
+          recipientId: program.memberId.toString(),
+          senderId: memberId.toString(),
+          notificationType: NotificationType.PROGRAM_JOINED,
+          notificationTitle: 'Someone joined your program',
+          notificationMessage: `A new member joined your program`,
+          notificationLink: `/programs/${programId}`,
+        });
+      }
+    } catch (_) {}
 
     return enrollment;
   }

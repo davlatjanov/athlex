@@ -9,12 +9,15 @@ import { Message } from '../../libs/enums/common.enum';
 import { MemberService } from '../member/member.service';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { T } from '../../libs/types/common';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class FollowService {
   constructor(
     @InjectModel('Follow') private followModel: Model<Follow>,
     private readonly memberService: MemberService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async followMember(
@@ -64,6 +67,19 @@ export class FollowService {
         1,
         'followers',
       );
+
+      // Notify the person being followed
+      try {
+        const follower = await this.memberService.getMember(null, memberId);
+        await this.notificationService.createNotification({
+          recipientId: followingId.toString(),
+          senderId: memberId.toString(),
+          notificationType: NotificationType.NEW_FOLLOWER,
+          notificationTitle: `${follower.memberNick} started following you`,
+          notificationMessage: `You have a new follower`,
+          notificationLink: `/member?memberId=${memberId}`,
+        });
+      } catch (_) {}
 
       return newFollow;
     }

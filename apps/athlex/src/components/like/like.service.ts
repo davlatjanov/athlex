@@ -9,6 +9,8 @@ import { MemberService } from '../member/member.service';
 import { ProductService } from '../product/product.service';
 import { TrainingProgramService } from '../training-program/training-program.service';
 import { shapeIntoMongoObjectId } from '../../libs/config';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class LikeService {
@@ -17,6 +19,7 @@ export class LikeService {
     private readonly memberService: MemberService,
     private readonly productService: ProductService,
     private readonly trainingProgramService: TrainingProgramService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async likeTargetItem(
@@ -52,6 +55,32 @@ export class LikeService {
 
       // Increment like count based on group
       await this.updateLikeCount(likeGroup, likeRefId, 1);
+
+      // Notify the content owner (skip PRODUCT — admin-owned)
+      try {
+        const targetId = shapeIntoMongoObjectId(likeRefId);
+        let recipientId: string | null = null;
+        let contentLabel = 'content';
+
+        if (likeGroup === LikeGroup.MEMBER) {
+          recipientId = likeRefId;
+          contentLabel = 'profile';
+        } else if (likeGroup === LikeGroup.PROGRAM) {
+          const program = await this.trainingProgramService.getProgramById(targetId);
+          recipientId = program.memberId.toString();
+          contentLabel = 'program';
+        }
+
+        if (recipientId && recipientId !== memberId.toString()) {
+          await this.notificationService.createNotification({
+            recipientId,
+            senderId: memberId.toString(),
+            notificationType: NotificationType.NEW_LIKE,
+            notificationTitle: `Someone liked your content`,
+            notificationMessage: `Your ${contentLabel} received a new like`,
+          });
+        }
+      } catch (_) {}
 
       return newLike;
     }

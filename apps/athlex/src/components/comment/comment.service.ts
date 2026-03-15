@@ -14,17 +14,17 @@ import { T } from '../../libs/types/common';
 import { lookupMember } from '../../libs/config';
 import { CommentGroup, CommentStatus } from '../../libs/enums/comment.enum';
 
-import { ProductService } from '../product/product.service';
 import { TrainingProgramService } from '../training-program/training-program.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectModel('Comment') private commentModel: Model<Comment>,
     private readonly memberService: MemberService,
-
-    private readonly productService: ProductService,
     private readonly trainingProgramService: TrainingProgramService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async createComment(
@@ -45,6 +45,34 @@ export class CommentService {
 
     // Increment member comments count
     await this.memberService.updateMemberByComment(memberId, 1);
+
+    // Notify the content owner
+    try {
+      let recipientId: string | null = null;
+      let notificationLink: string | undefined;
+
+      if (input.commentGroup === CommentGroup.PROGRAM) {
+        const program = await this.trainingProgramService.getProgramById(commentRefId);
+        recipientId = program.memberId.toString();
+        notificationLink = `/programs?programId=${input.commentRefId}`;
+      } else if (input.commentGroup === CommentGroup.TRAINER) {
+        recipientId = input.commentRefId;
+        notificationLink = `/member?memberId=${input.commentRefId}`;
+      }
+      // PRODUCT comments are skipped — products are admin-owned
+
+      if (recipientId && recipientId !== memberId.toString()) {
+        await this.notificationService.createNotification({
+          recipientId,
+          senderId: memberId.toString(),
+          notificationType: NotificationType.COMMENT_REPLY,
+          notificationTitle: `New comment on your content`,
+          notificationMessage: input.commentContent.slice(0, 60),
+          notificationLink,
+        });
+      }
+    } catch (_) {}
+
     return newComment;
   }
 

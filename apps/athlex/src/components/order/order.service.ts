@@ -13,12 +13,15 @@ import {
 } from '../../libs/dto/order/order.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '../../libs/enums/notification.enum';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel('Order') private orderModel: Model<Order>,
     @InjectModel('Product') private productModel: Model<any>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async createOrder(
@@ -141,6 +144,17 @@ export class OrderService {
         });
       }
     }
+
+    // Notify buyer
+    try {
+      await this.notificationService.createNotification({
+        recipientId: result.memberId.toString(),
+        notificationType: NotificationType.ORDER_UPDATE,
+        notificationTitle: 'Order status updated',
+        notificationMessage: `Your order status changed to ${result.orderStatus}`,
+        notificationLink: `/mypage?category=myOrders`,
+      });
+    } catch (_) {}
 
     return result;
   }

@@ -8,6 +8,7 @@ import { FeedbackService } from './feedback.service';
 
 import { ProductModule } from '../product/product.module';
 import { TrainingProgramModule } from '../training-program/training-program.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TrainingProgramModule } from '../training-program/training-program.modu
     ProductModule, // ✅ Add this
     TrainingProgramModule, // ✅ Add this
     MemberModule,
+    NotificationModule,
   ],
   providers: [FeedbackResolver, FeedbackService],
   exports: [FeedbackService],
