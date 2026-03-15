@@ -66,7 +66,6 @@ export class BookmarkService {
     const result = await this.bookmarkModel
       .aggregate([
         { $match: match },
-        { $sort: sortOption },
         // Lookup products
         {
           $lookup: {
@@ -83,15 +82,6 @@ export class BookmarkService {
             localField: 'bookmarkRefId',
             foreignField: '_id',
             as: 'programData',
-          },
-        },
-        // Lookup progress results
-        {
-          $lookup: {
-            from: 'progressResults',
-            localField: 'bookmarkRefId',
-            foreignField: '_id',
-            as: 'progressResultData',
           },
         },
         {
@@ -129,6 +119,8 @@ export class BookmarkService {
             },
           },
         },
+        // Sort AFTER project so field paths resolve correctly
+        { $sort: sortOption },
         {
           $facet: {
             list: [{ $skip: (page - 1) * limit }, { $limit: limit }],

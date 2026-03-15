@@ -111,7 +111,7 @@ ${safeContext ? `Additional context: ${safeContext}` : ''}`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: question },
         ],
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.7,
         max_tokens: 400,
       });
@@ -185,7 +185,7 @@ ${safeContext ? `Additional context: ${safeContext}` : ''}`;
 
       const completion = await this.groq.chat.completions.create({
         messages: [systemMessage, ...storedMessages, ...newMessages],
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.7,
         max_tokens: 500,
       });
@@ -234,5 +234,16 @@ ${safeContext ? `Additional context: ${safeContext}` : ''}`;
       })
       .lean()
       .exec();
+  }
+
+  async deleteConversation(
+    memberId: ObjectId,
+    conversationId: string,
+  ): Promise<boolean> {
+    const result = await this.conversationModel.deleteOne({
+      _id: shapeIntoMongoObjectId(conversationId),
+      memberId: shapeIntoMongoObjectId(memberId),
+    });
+    return result.deletedCount > 0;
   }
 }

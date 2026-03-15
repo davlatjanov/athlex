@@ -78,4 +78,14 @@ export class AIResolver {
     console.log('Query: getConversation');
     return this.aiService.getConversation(memberId, conversationId);
   }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Boolean)
+  public async deleteConversation(
+    @Args('conversationId') conversationId: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<boolean> {
+    console.log('Mutation: deleteConversation');
+    return this.aiService.deleteConversation(memberId, conversationId);
+  }
 }
