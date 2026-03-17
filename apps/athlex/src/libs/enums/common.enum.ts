@@ -22,6 +22,7 @@ export enum Message {
   DELETE_FAILED = 'DELETE_FAILED',
   ALREADY_JOINED = 'ALREADY_JOINED',
   NOT_ALLOWED = 'NOT_ALLOWED',
+  PAYMENT_REQUIRED = 'PAYMENT_REQUIRED',
 }
 
 export enum Direction {

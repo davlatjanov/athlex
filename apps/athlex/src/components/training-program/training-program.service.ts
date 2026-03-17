@@ -26,6 +26,7 @@ export class TrainingProgramService {
     @InjectModel('ProgramEnrollment')
     private programEnrollmentModel: Model<ProgramEnrollment>,
     @InjectModel('Program') private programModel: Model<Program>,
+    @InjectModel('Order') private orderModel: Model<any>,
     private readonly authService: AuthService,
     private readonly viewService: ViewService,
     private readonly memberService: MemberService,
@@ -438,6 +439,20 @@ export class TrainingProgramService {
 
     if (existingEnrollment) {
       throw new InternalServerErrorException(Message.ALREADY_JOINED);
+    }
+
+    // Paid programs require a PAID order with matching programId in notes
+    if (program.programPrice > 0) {
+      const paidOrder = await this.orderModel
+        .findOne({
+          memberId,
+          orderStatus: 'PAID',
+          notes: programId.toString(),
+        })
+        .exec();
+      if (!paidOrder) {
+        throw new InternalServerErrorException(Message.PAYMENT_REQUIRED);
+      }
     }
 
     const enrollment = await this.programEnrollmentModel.create({

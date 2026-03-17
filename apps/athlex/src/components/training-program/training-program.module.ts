@@ -8,6 +8,7 @@ import { ViewModule } from '../view/view.module';
 import { MemberModule } from '../member/member.module';
 import { NotificationModule } from '../notification/notification.module';
 import ProgramEnrollmentSchema from '../../schemas/ProgramEnrollment.schema';
+import OrderSchema from '../../schemas/Order.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import ProgramEnrollmentSchema from '../../schemas/ProgramEnrollment.schema';
         schema: TrainingProgramSchema,
       },
       { name: 'ProgramEnrollment', schema: ProgramEnrollmentSchema },
+      { name: 'Order', schema: OrderSchema },
     ]),
     AuthModule,
     ViewModule,
