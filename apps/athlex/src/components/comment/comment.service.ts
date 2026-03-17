@@ -130,11 +130,9 @@ export class CommentService {
 
   public async getComments(input: CommentInquiry): Promise<Comments> {
     const { page, limit, sort, direction, commentRefId, commentGroup } = input;
-    const match: T = {
-      commentStatus: CommentStatus.ACTIVE,
-      commentRefId: shapeIntoMongoObjectId(commentRefId),
-      commentGroup,
-    };
+    const match: T = { commentStatus: CommentStatus.ACTIVE };
+    if (commentRefId) match.commentRefId = shapeIntoMongoObjectId(commentRefId);
+    if (commentGroup) match.commentGroup = commentGroup;
 
     const sortOption: T = {
       [sort ?? 'createdAt']: direction ?? Direction.DESC,

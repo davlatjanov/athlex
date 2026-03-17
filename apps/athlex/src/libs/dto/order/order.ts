@@ -1,7 +1,7 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import mongoose from 'mongoose';
 import { OrderStatus } from '../../enums/order.enum';
-import { TotalCounter } from '../member/member';
+import { TotalCounter, Member } from '../member/member';
 
 @ObjectType()
 export class ShippingAddress {
@@ -70,6 +70,9 @@ export class Order {
 
   @Field(() => Date)
   updatedAt?: Date;
+
+  @Field(() => Member, { nullable: true })
+  memberData?: Member;
 }
 
 @ObjectType()

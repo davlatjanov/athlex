@@ -24,11 +24,11 @@ export class FeedbackInquiry {
   @Field(() => Direction, { nullable: true })
   direction?: Direction;
 
-  @IsNotEmpty()
-  @Field(() => String)
-  feedbackRefId: string;
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  feedbackRefId?: string;
 
-  @IsNotEmpty()
-  @Field(() => FeedbackGroup)
-  feedbackGroup: FeedbackGroup;
+  @IsOptional()
+  @Field(() => FeedbackGroup, { nullable: true })
+  feedbackGroup?: FeedbackGroup;
 }

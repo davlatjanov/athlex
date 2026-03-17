@@ -130,10 +130,9 @@ export class FeedbackService {
   public async getFeedbacks(input: FeedbackInquiry): Promise<Feedbacks> {
     const { page, limit, sort, direction, feedbackRefId, feedbackGroup } =
       input;
-    const match: T = {
-      feedbackRefId: shapeIntoMongoObjectId(feedbackRefId),
-      feedbackGroup,
-    };
+    const match: T = {};
+    if (feedbackRefId) match.feedbackRefId = shapeIntoMongoObjectId(feedbackRefId);
+    if (feedbackGroup) match.feedbackGroup = feedbackGroup;
 
     const sortOption: T = {
       [sort ?? 'createdAt']: direction ?? Direction.DESC,

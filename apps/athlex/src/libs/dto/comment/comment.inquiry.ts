@@ -24,11 +24,11 @@ export class CommentInquiry {
   @Field(() => Direction, { nullable: true })
   direction?: Direction;
 
-  @IsNotEmpty()
-  @Field(() => String)
-  commentRefId: string;
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  commentRefId?: string;
 
-  @IsNotEmpty()
-  @Field(() => CommentGroup)
-  commentGroup: CommentGroup;
+  @IsOptional()
+  @Field(() => CommentGroup, { nullable: true })
+  commentGroup?: CommentGroup;
 }
