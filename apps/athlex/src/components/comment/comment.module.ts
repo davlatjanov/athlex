@@ -8,6 +8,7 @@ import { CommentService } from './comment.service';
 
 import { ProductModule } from '../product/product.module';
 import { TrainingProgramModule } from '../training-program/training-program.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TrainingProgramModule } from '../training-program/training-program.modu
         schema: CommentSchema,
       },
     ]),
+    NotificationModule,
     AuthModule,
     MemberModule,
     ProductModule, // ✅ Add this (to get product owner)

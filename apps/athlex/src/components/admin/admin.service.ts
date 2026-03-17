@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
+import { DashboardStats } from './admin.resolver';
 import { MembersInquiry } from '../../libs/dto/member/member.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
@@ -117,7 +118,7 @@ export class AdminService {
     return result[0];
   }
 
-  public async getDashboardStats(): Promise<T> {
+  public async getDashboardStats(): Promise<DashboardStats> {
     const [
       totalMembers,
       activeMembers,
