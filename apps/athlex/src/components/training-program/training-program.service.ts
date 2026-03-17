@@ -510,6 +510,66 @@ export class TrainingProgramService {
       .exec();
   }
 
+  // ==================== GET MY STUDENTS (TRAINER) ====================
+  public async getMyStudents(
+    trainerId: ObjectId,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<{ list: any[]; total: number }> {
+    const trainerPrograms = await this.programModel
+      .find({ memberId: trainerId })
+      .select('_id programName')
+      .lean()
+      .exec();
+
+    if (!trainerPrograms.length) return { list: [], total: 0 };
+
+    const programIds = trainerPrograms.map((p) => p._id);
+    const programMap: Record<string, string> = {};
+    trainerPrograms.forEach((p: any) => { programMap[p._id.toString()] = p.programName; });
+
+    const result = await this.programEnrollmentModel
+      .aggregate([
+        { $match: { programId: { $in: programIds } } },
+        {
+          $lookup: {
+            from: 'members',
+            localField: 'memberId',
+            foreignField: '_id',
+            as: 'memberData',
+          },
+        },
+        { $unwind: { path: '$memberData', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            memberId: '$memberData._id',
+            memberNick: '$memberData.memberNick',
+            memberImage: '$memberData.memberImage',
+            memberFullName: '$memberData.memberFullName',
+            programId: 1,
+            enrolledAt: 1,
+          },
+        },
+        { $sort: { enrolledAt: -1 } },
+        {
+          $facet: {
+            list: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    const raw = result[0] ?? { list: [], metaCounter: [] };
+    const total = raw.metaCounter?.[0]?.total ?? 0;
+    const list = raw.list.map((s: any) => ({
+      ...s,
+      programName: programMap[s.programId?.toString()] ?? '',
+    }));
+
+    return { list, total };
+  }
+
   // ==================== GET PROGRAM BY ID ====================
   public async getProgramById(programId: ObjectId): Promise<Program> {
     const program = await this.programModel.findById(programId).exec();

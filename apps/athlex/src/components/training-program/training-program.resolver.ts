@@ -11,7 +11,7 @@ import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { ProgramEnrollment } from '../../libs/dto/programEnrollment/programEnrollment';
+import { ProgramEnrollment, Students } from '../../libs/dto/programEnrollment/programEnrollment';
 import { Program, Programs } from '../../libs/dto/trainingProgram/program';
 import {
   ProgramInput,
@@ -148,5 +148,17 @@ export class TrainingProgramResolver {
   ): Promise<ProgramEnrollment> {
     console.log('Mutation: leaveProgram');
     return await this.programService.leaveProgram(memberId, programId);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.TRAINER)
+  @Query(() => Students)
+  public async getMyStudents(
+    @Args('page', { type: () => Number, defaultValue: 1 }) page: number,
+    @Args('limit', { type: () => Number, defaultValue: 20 }) limit: number,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Students> {
+    console.log('Query: getMyStudents');
+    return await this.programService.getMyStudents(memberId, page, limit);
   }
 }
