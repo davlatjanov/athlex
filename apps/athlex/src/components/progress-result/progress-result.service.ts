@@ -26,13 +26,13 @@ export class ProgressResultService {
     memberId: ObjectId,
     input: ProgressResultInput,
   ): Promise<ProgressResult> {
-    const programId = shapeIntoMongoObjectId(input.programId);
-    const trainerId = shapeIntoMongoObjectId(input.trainerId);
+    const programId = input.programId ? shapeIntoMongoObjectId(input.programId) : undefined;
+    const trainerId = input.trainerId ? shapeIntoMongoObjectId(input.trainerId) : undefined;
 
     const newProgressResult = await this.progressResultModel.create({
       ...input,
-      programId,
-      trainerId,
+      ...(programId && { programId }),
+      ...(trainerId && { trainerId }),
       memberId,
     });
 
@@ -145,8 +145,8 @@ export class ProgressResultService {
             as: 'trainerData',
           },
         },
-        { $unwind: '$memberData' },
-        { $unwind: '$trainerData' },
+        { $unwind: { path: '$memberData', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$trainerData', preserveNullAndEmptyArrays: true } },
         {
           $facet: {
             list: [{ $skip: (page - 1) * limit }, { $limit: limit }],
@@ -186,7 +186,7 @@ export class ProgressResultService {
             as: 'trainerData',
           },
         },
-        { $unwind: '$trainerData' },
+        { $unwind: { path: '$trainerData', preserveNullAndEmptyArrays: true } },
         {
           $facet: {
             list: [{ $skip: (page - 1) * limit }, { $limit: limit }],

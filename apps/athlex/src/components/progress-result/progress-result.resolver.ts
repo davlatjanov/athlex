@@ -6,10 +6,12 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { ProgressResultService } from './progress-result.service';
-
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { WithoutGuard } from '../auth/guards/without.guard';
-import { shapeIntoMongoObjectId } from '../../libs/config';
+import { getSerialForCloudinary, shapeIntoMongoObjectId, validMimeTypes } from '../../libs/config';
 import { MemberType } from '../../libs/enums/member.enum';
+import { Message } from '../../libs/enums/common.enum';
+import { uploadToCloudinary } from '../../libs/utils/cloudinary-uploader';
 import {
   ProgressResultInput,
   ProgressResultInquiry,
@@ -28,13 +30,27 @@ export class ProgressResultResolver {
   @Mutation(() => ProgressResult)
   public async createProgressResult(
     @Args('input') input: ProgressResultInput,
+    @Args('files', { type: () => [GraphQLUpload], nullable: true, defaultValue: [] })
+    files: Promise<FileUpload>[],
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<ProgressResult> {
     console.log('Mutation: createProgressResult');
-    return await this.progressResultService.createProgressResult(
-      memberId,
-      input,
-    );
+
+    if (files?.length) {
+      const uploadedUrls: string[] = [];
+      await Promise.all(
+        files.map(async (filePromise, index) => {
+          const { filename, mimetype, createReadStream } = await filePromise;
+          if (!validMimeTypes.includes(mimetype)) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+          const imageName = getSerialForCloudinary(filename);
+          const url = await uploadToCloudinary(createReadStream(), 'progress', imageName);
+          uploadedUrls[index] = url;
+        }),
+      );
+      input.images = uploadedUrls.filter(Boolean);
+    }
+
+    return await this.progressResultService.createProgressResult(memberId, input);
   }
 
   @UseGuards(AuthGuard)

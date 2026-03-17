@@ -1,5 +1,5 @@
 // libs/dto/progress-result/progress-result.ts
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
 import { ProgressResultStatus } from '../../enums/progress-result.enum';
 import { Member } from '../member/member';
@@ -13,14 +13,14 @@ export class ProgressResult {
   @Field(() => String)
   memberId: ObjectId;
 
-  @Field(() => String)
-  programId: ObjectId;
+  @Field(() => String, { nullable: true })
+  programId?: ObjectId;
 
-  @Field(() => String)
-  trainerId: ObjectId;
+  @Field(() => String, { nullable: true })
+  trainerId?: ObjectId;
 
-  @Field(() => [String])
-  images: string[];
+  @Field(() => [String], { nullable: true })
+  images?: string[];
 
   @Field(() => String)
   content: string;

@@ -9,19 +9,18 @@ const ProgressResultSchema = new Schema(
       ref: 'Member',
     },
     programId: {
-      // ✅ Renamed from trainingProgramRefId
       type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Program', // ✅ Match your collection name
+      required: false,
+      ref: 'Program',
     },
     trainerId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: 'Member',
     },
     images: {
       type: [String],
-      required: true,
+      default: [],
     },
     content: {
       type: String,
