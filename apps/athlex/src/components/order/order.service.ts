@@ -33,17 +33,22 @@ export class OrderService {
     for (const item of input.items) {
       totalAmount += item.productPrice * item.quantity;
 
-      // Optionally validate stock
-      const product = await this.productModel.findById(item.productId).exec();
-      if (!product) {
-        throw new InternalServerErrorException(
-          `Product ${item.productId} not found`,
-        );
-      }
-      if (product.productStock < item.quantity) {
-        throw new InternalServerErrorException(
-          `Insufficient stock for ${product.productName}`,
-        );
+      // Validate stock only for real products (program orders use notes as ref)
+      if (!input.notes) {
+        const product = await this.productModel.findById(item.productId).exec();
+        if (!product) {
+          throw new InternalServerErrorException(
+            `Product ${item.productId} not found`,
+          );
+        }
+        if (product.productStock < item.quantity) {
+          throw new InternalServerErrorException(
+            `Insufficient stock for ${product.productName}`,
+          );
+        }
+        await this.productModel.findByIdAndUpdate(item.productId, {
+          $inc: { productStock: -item.quantity },
+        });
       }
     }
 
@@ -58,13 +63,6 @@ export class OrderService {
 
     if (!order) {
       throw new InternalServerErrorException(Message.CREATE_FAILED);
-    }
-
-    // Decrease product stock
-    for (const item of input.items) {
-      await this.productModel.findByIdAndUpdate(item.productId, {
-        $inc: { productStock: -item.quantity },
-      });
     }
 
     return order;
