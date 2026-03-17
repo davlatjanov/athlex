@@ -4,6 +4,7 @@ import { Member, Members } from '../../libs/dto/member/member';
 import {
   LoginInput,
   MemberInput,
+  MembersInquiry,
   TrainersInquiry,
 } from '../../libs/dto/member/member.input';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -75,6 +76,14 @@ export class MemberResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Members)
+  public async getMembers(
+    @Args('input') input: MembersInquiry,
+  ): Promise<Members> {
+    console.log('Query getMembers');
+    return this.memberService.getMembers(input);
+  }
+
+  @Query(() => Members)
   public async getTrainers(
     @Args('input') input: TrainersInquiry,
     @AuthMember('_id') memberId: ObjectId,
@@ -109,9 +118,9 @@ export class MemberResolver {
       // Upload to Cloudinary
       const cloudinaryUrl = await uploadToCloudinary(stream, target, imageName);
 
-      await this.memberService.updateMember(memberId, {
-        memberImage: cloudinaryUrl,
-      });
+      if (target === 'member') {
+        await this.memberService.updateMember(memberId, { memberImage: cloudinaryUrl });
+      }
       return cloudinaryUrl;
     } catch (error) {
       console.error('Upload error:', error);

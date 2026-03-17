@@ -8,6 +8,7 @@ import { Model, ObjectId } from 'mongoose';
 import {
   LoginInput,
   MemberInput,
+  MembersInquiry,
   TrainersInquiry,
 } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member/member';
@@ -162,6 +163,27 @@ export class MemberService {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     }
 
+    return result[0];
+  }
+
+  public async getMembers(input: MembersInquiry): Promise<Members> {
+    const match: T = { memberStatus: MemberStatus.ACTIVE };
+    if (input.search?.memberType) match.memberType = input.search.memberType;
+    if (input.search?.text) match.memberNick = { $regex: new RegExp(input.search.text, 'i') };
+
+    const result = await this.memberModel
+      .aggregate([
+        { $match: match },
+        { $sort: { createdAt: Direction.DESC } },
+        {
+          $facet: {
+            list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
   }
 
