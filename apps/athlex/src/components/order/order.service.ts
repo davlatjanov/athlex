@@ -12,6 +12,7 @@ import {
   OrderUpdateInput,
 } from '../../libs/dto/order/order.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
+import { OrderStatus } from '../../libs/enums/order.enum';
 import { T } from '../../libs/types/common';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../libs/enums/notification.enum';
@@ -59,6 +60,9 @@ export class OrderService {
       shippingAddress: input.shippingAddress,
       paymentMethod: input.paymentMethod ?? 'CARD',
       notes: input.notes,
+      // Program orders are marked PAID immediately (simulated payment)
+      orderStatus: input.notes ? OrderStatus.PAID : OrderStatus.PENDING,
+      paymentId: input.notes ? `sim_${Date.now()}` : undefined,
     });
 
     if (!order) {
