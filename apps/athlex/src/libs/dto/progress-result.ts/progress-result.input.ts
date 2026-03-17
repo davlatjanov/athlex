@@ -6,20 +6,20 @@ import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class ProgressResultInput {
-  @IsNotEmpty()
-  @Field(() => String)
-  programId: string;
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  programId?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  trainerId?: string;
+
+  @IsOptional()
+  @Field(() => [String], { nullable: true })
+  images?: string[];
 
   @IsNotEmpty()
-  @Field(() => String)
-  trainerId: string;
-
-  @IsNotEmpty()
-  @Field(() => [String])
-  images: string[];
-
-  @IsNotEmpty()
-  @Length(10, 1000)
+  @Length(1, 1000)
   @Field(() => String)
   content: string;
 }
