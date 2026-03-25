@@ -122,6 +122,34 @@ export class TrainingProgramService {
             preserveNullAndEmptyArrays: true,
           },
         },
+        ...(memberId
+          ? [
+              {
+                $lookup: {
+                  from: 'likes',
+                  let: { programId: '$_id' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [
+                            { $eq: ['$likeRefId', '$$programId'] },
+                            { $eq: ['$memberId', new Types.ObjectId(memberId.toString())] },
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                  as: 'myLikeData',
+                },
+              },
+              {
+                $addFields: {
+                  meLiked: { $gt: [{ $size: '$myLikeData' }, 0] },
+                },
+              },
+            ]
+          : []),
         {
           $facet: {
             list: [

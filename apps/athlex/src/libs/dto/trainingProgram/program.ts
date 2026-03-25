@@ -200,6 +200,9 @@ export class Program {
   @Field(() => MemberData, { nullable: true })
   memberData?: MemberData;
 
+  @Field(() => Boolean, { nullable: true })
+  meLiked?: boolean;
+
   @Field(() => Date)
   createdAt: Date;
 
