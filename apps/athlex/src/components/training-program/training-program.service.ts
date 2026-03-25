@@ -405,7 +405,7 @@ export class TrainingProgramService {
 
     const result = await this.programEnrollmentModel
       .aggregate([
-        { $match: { memberId } },
+        { $match: { memberId: new Types.ObjectId(memberId.toString()) } },
         {
           $lookup: {
             from: 'programs',
@@ -445,8 +445,7 @@ export class TrainingProgramService {
       ])
       .exec();
 
-    if (!result.length)
-      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    if (!result.length) return { list: [], metaCounter: [] };
 
     return result[0];
   }
