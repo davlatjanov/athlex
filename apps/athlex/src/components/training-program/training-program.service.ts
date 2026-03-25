@@ -238,6 +238,7 @@ export class TrainingProgramService {
           { _id: programId },
           { $inc: { programViews: 1 } },
         );
+        result.programViews = (result.programViews ?? 0) + 1;
       }
     }
 
